@@ -19,3 +19,6 @@ project/plugins/project/
 # intelliJ specific
 .idea/*
 
+# activator/play specific
+RUNNING_PID
+
