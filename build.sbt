@@ -2,15 +2,21 @@ name := """WalletControl"""
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val commonSettings= Seq(
+  organization := "br.com.wallet",
+  scalaVersion := "2.11.6"
+)
 
-scalaVersion := "2.11.6"
+lazy val root = (project in file("."))
+  .settings(commonSettings: _*)
+  .enablePlugins(PlayScala)
 
-libraryDependencies += "org.postgresql" % "postgresql" % "9.4-1200-jdbc41"
+// scalaVersion := "2.11.6"
 
 libraryDependencies ++= Seq(
   jdbc,
   anorm,
   cache,
-  ws
+  ws,
+  "org.postgresql" % "postgresql" % "9.4-1200-jdbc41"
 )
