@@ -18,5 +18,6 @@ libraryDependencies ++= Seq(
   anorm,
   cache,
   ws,
-  "org.postgresql" % "postgresql" % "9.4-1200-jdbc41"
+  "org.postgresql" % "postgresql" % "9.4-1200-jdbc41",
+  "com.github.nscala-time" %% "nscala-time" % "1.8.0"
 )
