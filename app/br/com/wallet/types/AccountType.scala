@@ -10,7 +10,9 @@ trait AccountType {
 
   def description: String
 
-  def balance: Double
+  def balance: List
+
+  def accname: String
 
   def closingday: DateTime
 }
