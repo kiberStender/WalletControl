@@ -63,6 +63,6 @@ NOT DEFERRABLE;
 # --- !Downs
 
 DROP TABLE balance;
-DROP TABLE accounttype;
 DROP TABLE item;
+DROP TABLE accounttype;
 DROP TABLE accuser;
