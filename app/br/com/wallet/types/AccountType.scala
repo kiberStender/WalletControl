@@ -10,7 +10,7 @@ trait AccountType {
 
   def description: String
 
-  def balance: List
+  def balance: List[Balance]
 
   def accname: String
 
