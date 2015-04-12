@@ -35,6 +35,7 @@ CREATE TABLE public.item (
   acctype VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
   purchaseDate DATE NOT NULL,
+  trtype VARCHAR(3) NOT NULL,
   CONSTRAINT itemid PRIMARY KEY (itemid, userid, acctype)
 );
 
