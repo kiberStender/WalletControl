@@ -22,4 +22,5 @@ project/plugins/project/
 
 # activator/play specific
 RUNNING_PID
+*.lock
 
