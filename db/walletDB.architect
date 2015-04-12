@@ -28,7 +28,7 @@
     <column id="COL6" populated="true" UUID="29a01eb0-f6c0-4fde-94c7-359ebb4c76c1" autoIncrement="false" autoIncrementSequenceName="item_purchaseDate_seq" defaultValue="" name="Purchase Date" nullable="0" physicalName="purchaseDate" precision="0" referenceCount="1" scale="0" sourceDataTypeName="UserDefinedSQLType" type="91" userDefinedTypeUUID="ee349be3-6af2-46e1-b305-975f5354b009" >
      <remarks></remarks>
     </column>
-    <column id="COL7" populated="true" UUID="a19fff3b-170c-493a-9db8-5dccbdd8054a" autoIncrement="false" autoIncrementSequenceName="item_type_seq" defaultValue="" name="Type" nullable="0" physicalName="type" precision="3" referenceCount="1" scale="0" sourceDataTypeName="UserDefinedSQLType" type="12" userDefinedTypeUUID="831ac2d4-0e65-47ec-a0b7-62b7f6b8760a" >
+    <column id="COL7" populated="true" UUID="a19fff3b-170c-493a-9db8-5dccbdd8054a" autoIncrement="false" autoIncrementSequenceName="item_trtype_seq" defaultValue="" name="Transaction Type" nullable="0" physicalName="trtype" precision="3" referenceCount="1" scale="0" sourceDataTypeName="UserDefinedSQLType" type="12" userDefinedTypeUUID="831ac2d4-0e65-47ec-a0b7-62b7f6b8760a" >
      <remarks></remarks>
     </column>
     </folder>
