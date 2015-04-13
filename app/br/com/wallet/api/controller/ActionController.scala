@@ -2,7 +2,6 @@ package br.com.wallet.api.controller
 
 import br.com.wallet.api.models.result.{Success, Failure}
 import br.com.wallet.types.AccUser
-import controllers.Application._
 import controllers.routes
 import play.api.libs.oauth.{RequestToken, ServiceInfo, OAuth, ConsumerKey}
 import play.api.mvc._
