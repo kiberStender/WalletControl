@@ -6,7 +6,7 @@ import play.api.http.{MimeTypes, HeaderNames}
 import play.api.libs.ws.WS
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import play.api.mvc.{AnyContent, Results, Action}
+import play.api.mvc.{Results, Action}
 import play.api.mvc.Results._
 
 /**
@@ -14,13 +14,11 @@ import play.api.mvc.Results._
  */
 object OAuth2Solver {
   lazy val app: Application = Play.current
-  private def authKey: Option[String] = app.configuration.getString("github.client.id")
-  private def authSec: Option[String] = app.configuration.getString("github.client.secret")
 
   def getAuthorizationUrl: String => String => String => Option[String] = redirectUri => scope => state => for {
     baseUrl <- app.configuration.getString("github.redirect.url")
     authId <- app.configuration.getString("github.client.id")
-  } yield baseUrl.format(authId, scope, state)
+  } yield baseUrl.format(authId, redirectUri, scope, state)
 
   private def getToken: String => Future[Option[String]] = code => (for {
     authSec <- app.configuration.getString("github.client.secret")
@@ -36,19 +34,18 @@ object OAuth2Solver {
       } yield (response.json \ "access_token").asOpt[String]
     }).getOrElse(Future(None))
 
-  def callbackUrl: Option[String] => Option[String] => Action[AnyContent] = codeOpt => stateOpt => Action.async { implicit request =>
+  def callbackUrl(codeOpt: Option[String] = None, stateOpt: Option[String] = None) = Action.async { implicit request =>
     (for {
       code <- codeOpt
       state <- stateOpt
       oauthState <- request.session.get("oauth-state")
-    } yield {
-        if(oauthState == state){
+    } yield if (oauthState == state) {
           for {
             accessToken <- getToken(code)
-            } yield Redirect("")
+          } yield Ok("Você está logado")
         } else {
-          Future.successful(BadRequest(""))
+          Future.successful(BadRequest("Você não está logado"))
         }
-      }).getOrElse(Future.successful(BadRequest("")))
+      ).getOrElse(Future.successful(BadRequest("Servidor não proveu os valores")))
   }
 }
