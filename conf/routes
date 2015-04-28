@@ -4,7 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /_oauth-callback            controllers.Application.auth_
+GET     /_oauth-callback            controllers.Application.auth_(code: Option[String], state: Option[String])
 GET     /_success                   controllers.Application.success
 
 # Map static resources from the /public folder to the /assets URL path
