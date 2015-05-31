@@ -352,7 +352,7 @@ fpJS = do ->
       
       req.onerror = -> reject new Error @statusText
       
-      req.open method method, url
+      req.open method, url
       req.setRequestHeader "Content-Type", "application/x-www-form-urlencoded"
       req.send convertObjectToQueryString mData
     
