@@ -24,7 +24,8 @@ fpJS = do ->
     if (@ + '') is s then 0 else if (@ + '') < s then -1 else 1
   else -2
   
-  #Set of abstract classes- JS has no abstract class itself so throw error in constructor is the way I found to ignore this detail
+  #Set of abstract classes- JS has no abstract class itself 
+  #So throw error in constructor is the way I found to ignore this detail
   class Any
     constructor: -> throw Error "(Any) No direct constructor"
     toString: -> "#{@}"
@@ -51,6 +52,7 @@ fpJS = do ->
     afmap: (fn) -> throw Error "(Applicative::afmap) No implementation"
 
   class Monad extends Applicative
+    identity: (a) -> a
     #Haskell >>= function
     flatMap: (fn) -> throw Error "(Monad::flatMap) No implementation"
 
@@ -72,6 +74,8 @@ fpJS = do ->
     @get = -> throw new Error "Nothing.get"
     @getOrElse = (v) -> v()
     @equals = (x) -> x instanceof Nothing
+    
+  just = (value) -> new Just value
 
   nothing = -> if notInstance is null
     notInstance = new Nothing()
@@ -249,19 +253,6 @@ fpJS = do ->
     else @
     
   seq = (items...) -> if items.length is 0 then nil() else (seq.apply @, items.slice 1).cons items[0]
-  
-  ## Need improvement
-  arrayToSeq = (arr) -> if arr instanceof Array
-    helper =  (head) -> (tail) -> if head instanceof Array
-      (helper head[0]) head.slice 1
-    else if tail.length is 0 then seq head
-    else ((helper tail[0]) tail.slice 1).cons head
-      
-    if arr.length is 0 then seq()
-    else
-      if arr[0] instanceof Array then (arrayToSeq arr.slice 1).cons (helper arr[0][0]) arr[0].slice 1
-      else (arrayToSeq arr.slice 1).cons arr[0]
-  else throw new Error "Not an Array"
 
   class Cons extends Seq then constructor: (head, tail) ->
     @isEmpty = -> false
@@ -342,6 +333,34 @@ fpJS = do ->
     @foreach = (io) -> @flatMap (a) -> io
     @toString = -> "IO"
     
+  class Ajax then constructor: (method = "GET", url = "", mData = map(), json = false) ->
+    xhr = -> if window.XMLHttpRequest 
+      new XMLHttpRequest() 
+    else new ActiveXObject("Microsoft.XMLHTTP")
+    
+    convertObjectToQueryString = (mData) -> (mData.reduceLeft "") (acc) -> (val) -> 
+      [key, value] = val
+      acc + "&#{key}=#{value}"
+      
+    parseJson = (resp) -> if json then JSON.parse resp else resp
+    
+    @httpFetch = -> new Promise (resolve, reject) ->
+      req = xhr()
+      
+      req.onreadystatechange = -> if @status is 200 then resolve parseJson @response
+      else reject new Error @statusText
+      
+      req.onerror = -> reject new Error @statusText
+      
+      req.open method method, url
+      req.setRequestHeader "Content-Type", "application/x-www-form-urlencoded"
+      req.send convertObjectToQueryString mData
+    
+  get = (url, json = false) -> (new Ajax "GET", url, map(), json).httpFetch()
+  post = (url, mData = map(), json = false) -> (new Ajax "POST", url, mData, json).httpFetch()
+  del = post
+  put = post
+    
   class FPNode then constructor: (obj) ->
     @getValue = -> new IO -> if obj instanceof HTMLInputElement then obj.value else obj.innerHTML
     
@@ -353,9 +372,7 @@ fpJS = do ->
       unit()
     
   IOPerformer = do ->
-    ioPerform = (fn) -> (str = "") -> new IO ->
-      fn str
-      unit()
+    ioPerform = (fn) -> (str = "") -> new IO -> (fn.andThen (_) -> unit()) str
     
     consoleIO = ioPerform console.log.bind console
     alertIO = ioPerform alert
@@ -392,17 +409,19 @@ fpJS = do ->
     #typeclases
     Functor, Applicative, Monad
     #maybe
-    Nothing, Just, nothing
+    nothing, just
     #collections.map
     map
     #collections.seq
-    seq, Cons, nil, arrayToSeq
+    seq, Cons, nil
     #utils.either
     Right, Left
     #utils.try_
     _try, Success, Failure
     #IO
     IO, FPNode, IOPerformer
+    #Ajax
+    get, post, del, put
     #State
     State
   }
