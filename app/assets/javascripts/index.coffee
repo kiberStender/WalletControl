@@ -4,6 +4,6 @@ main -> consoleIO(
   get "/auth", true
     .then (x) ->
       {logged, desc} = x
-      window.location =  = if logged then "/spreadsheet" else desc
+      window.location = if logged then "/spreadsheet" else desc
     .catch alert
 )
