@@ -7,6 +7,7 @@ GET     /                           controllers.Application.index
 GET     /auth                       controllers.Application.auth
 GET     /_oauth_callback            controllers.Application.auth_(code: Option[String], state: Option[String])
 GET     /_success                   controllers.Application.success
+GET     /spreadsheet                controllers.Application.spreadsheet
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
