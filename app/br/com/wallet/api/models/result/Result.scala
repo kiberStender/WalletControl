@@ -12,6 +12,8 @@ trait Result[A] {
     case None => ""
     case Some(a) => a
   }))
+
+  override def toString = s"Result: {failed: $failed, result: $result, description: $description}"
 }
 
 case class Failure(des: String) extends Result[String]{
