@@ -3,9 +3,9 @@
 # ~~~~
 
 # Back end
-GET     /auth                       controllers.Application.auth
-GET     /_oauth_callback            controllers.Application.auth_(code: Option[String], state: Option[String])
-GET     /_success                   controllers.Application.success
+GET     /auth                       br.com.wallet.controllers.BackEndController.auth
+GET     /_oauth_callback            br.com.wallet.controllers.BackEndController.auth_(code: Option[String], state: Option[String])
+GET     /_success                   br.com.wallet.controllers.BackEndController.success
 
 # Graphical user interface
 GET     /                           br.com.wallet.controllers.FrontEndController.index
