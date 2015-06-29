@@ -4,6 +4,6 @@ main -> consoleIO(
   get "/auth", true
     .then (x) ->
       {failed, result, description} = x
-      window.location = if not failed then "/spreadsheet" else result
+      window.location = if failed then description else "/spreadsheet"
     .catch alert
 )
