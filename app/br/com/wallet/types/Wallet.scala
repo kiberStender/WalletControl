@@ -13,13 +13,13 @@ case class Wallet(
 }
 
 object Wallet {
-  def apply (numeration: String, balance: List[Balance], clsingday: DateTime): Wallet = {
+  def apply (numeration: String, balance: List[Balance], closingday: DateTime): Wallet = {
     def description = s"Cartão de crédito: $numeration"
 
-    def acctypeid = clsingday.toString split 'T' match {
+    def acctypeid = closingday.toString split 'T' match {
       case Array(date, _) => sha1(s"$date|$description|${DateTime.now}")
     }
 
-    new Wallet(acctypeid, description, balance, clsingday)
+    new Wallet(acctypeid, description, balance, closingday)
   }
 }

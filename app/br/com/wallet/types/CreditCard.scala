@@ -13,13 +13,13 @@ case class CreditCard(
 }
 
 object CreditCard {
-  def apply (numeration: String, bal: List[Balance], clsingday: DateTime): CreditCard = {
+  def apply (numeration: String, bal: List[Balance], closingday: DateTime): CreditCard = {
     def description = s"Cartão de crédito: $numeration"
 
-    def acctypeid = clsingday.toString split 'T' match {
+    def acctypeid = closingday.toString split 'T' match {
       case Array(date, _) => sha1(s"$date|$description")
     }
 
-    new CreditCard(acctypeid, description, bal, clsingday)
+    new CreditCard(acctypeid, description, bal, closingday)
   }
 }
