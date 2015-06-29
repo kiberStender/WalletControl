@@ -3,7 +3,7 @@
 main -> consoleIO(
   get "/auth", true
     .then (x) ->
-      {logged, desc} = x
-      window.location = if logged then "/spreadsheet" else desc
+      {failed, result, description} = x
+      window.location = if not failed then "/spreadsheet" else result
     .catch alert
 )
