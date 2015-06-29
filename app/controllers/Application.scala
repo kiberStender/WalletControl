@@ -3,6 +3,7 @@ package controllers
 import java.util.UUID
 
 import br.com.wallet.api.controller.ActionController
+import br.com.wallet.api.models.result.{Failure, Success}
 import br.com.wallet.api.oAuth.OAuth2Solver
 import play.api.http.HeaderNames
 import play.api.libs.ws.WS
@@ -23,19 +24,25 @@ object Application extends ActionController {
 
   def auth = Action.async { implicit req =>
     Future {
-      Ok {
-        req.session.get("oauth-state") match {
-          case Some(token) => s"""{"logged": true, "desc": "$token"}"""
-          case None =>
-            def callbackUrl = routes.Application.auth_(None, None).absoluteURL()
-            lazy val state = UUID.randomUUID().toString
+      def result: Either[Option[(String, String)], String] = req.session.get("oauth-state") match {
+        case Some(token) => Right(token)
+        case None =>
+          def callbackUrl = routes.Application.auth_(None, None).absoluteURL()
+          lazy val state = UUID.randomUUID().toString
 
+          Left {
             OAuth2Solver.getAuthorizationUrl(callbackUrl)("repo")(state) match {
-              case Some(url) => s"""{"logged": false, "desc": "$url"}""" //Redirect(url).withSession("oauth-state" -> state)
-              case None => """{"logged": false, "desc": "AuthKey was not provided"}"""
+              case Some(url) => Some((url, state))
+              case None => None
             }
-        }
-      } as jsonApp
+          }
+      }
+
+      (result match {
+        case Right(token) => Ok(Success(token) toJson)
+        case Left(Some((url, state))) => Ok(Failure(url) toJson) withSession "oauth-state"-> state
+        case Left(None) => Ok(Failure("AuthKey was not provided") toJson)
+      }) as jsonApp
     }
   }
 
@@ -51,9 +58,13 @@ object Application extends ActionController {
     }
   }
 
+  def logoff = Action.async { implicit req =>
+    Future.successful(Ok (views.html.index("Redirecting...")) withNewSession)
+  }
+
   def spreadsheet = Action.async { request =>
     Future {
-      Ok("")
+      Ok(views.html.spreadsheet(""))
     }
   }
 }
