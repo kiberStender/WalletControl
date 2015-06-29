@@ -8,8 +8,9 @@ GET     /_oauth_callback            controllers.Application.auth_(code: Option[S
 GET     /_success                   controllers.Application.success
 
 # Graphical user interface
-GET     /                           controllers.Application.index
-GET     /spreadsheet                controllers.Application.spreadsheet
+GET     /                           br.com.wallet.controllers.FrontEndController.index
+GET     /spreadsheet                br.com.wallet.controllers.FrontEndController.spreadsheet
+GET     /logout                     br.com.wallet.controllers.FrontEndController.logoff
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
