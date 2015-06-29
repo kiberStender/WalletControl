@@ -2,11 +2,13 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index
+# Back end
 GET     /auth                       controllers.Application.auth
 GET     /_oauth_callback            controllers.Application.auth_(code: Option[String], state: Option[String])
 GET     /_success                   controllers.Application.success
+
+# Graphical user interface
+GET     /                           controllers.Application.index
 GET     /spreadsheet                controllers.Application.spreadsheet
 
 # Map static resources from the /public folder to the /assets URL path
