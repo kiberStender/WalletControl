@@ -5,10 +5,12 @@ import java.util.UUID
 import br.com.wallet.api.controller.ActionController
 import br.com.wallet.api.models.result.{Failure, Success}
 import br.com.wallet.api.oAuth.OAuth2Solver
-import controllers.routes
 import play.api.http.HeaderNames
 import play.api.libs.ws.WS
 import play.api.mvc.Action
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.Play.current
+import scala.language.postfixOps
 
 import scala.concurrent.Future
 
@@ -22,7 +24,7 @@ object BackEndController extends ActionController{
       def result: Either[Option[(String, String)], String] = req.session.get("oauth-state") match {
         case Some(token) => Right(token)
         case None =>
-          def callbackUrl = routes.Application.auth_(None, None).absoluteURL()
+          def callbackUrl = routes.BackEndController.auth_(None, None).absoluteURL()
           lazy val state = UUID.randomUUID().toString
 
           Left {
