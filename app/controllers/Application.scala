@@ -64,7 +64,10 @@ object Application extends ActionController {
 
   def spreadsheet = Action.async { request =>
     Future {
-      Ok(views.html.spreadsheet(""))
+      request.session.get("user") match {
+        case Some(_) => Ok(views.html.spreadsheet(""))
+        case None => Ok(views.html.index("Redirecting...")) withNewSession
+      }
     }
   }
 }
