@@ -10,11 +10,12 @@ trait LoginTypes {
   def loginType: String
   def clientId: Option[String] = conf.getString(s"${loginType}.client.id")
   def secret: Option[String] = conf.getString(s"${loginType}.client.secret")
+  def state: String
   def scope: String
   def authUrl: String
   def redirectUri: String
 
   def url = for {
     clId <- clientId
-  } yield s"$authUrl?client_id=$clId&redirect_uri=$redirectUri&scope=$scope"
+  } yield s"$authUrl?client_id=$clId&redirect_uri=$redirectUri&scope=$scope&state=$state"
 }

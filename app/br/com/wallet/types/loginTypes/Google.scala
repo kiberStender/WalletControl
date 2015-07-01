@@ -5,7 +5,7 @@ import play.api.Configuration
 /**
  * Created by sirkleber on 29/06/15.
  */
-case class Google(conf: Configuration, redirectUri: String) extends LoginTypes {
+case class Google(conf: Configuration, redirectUri: String, state: String) extends LoginTypes {
 
   def scope: String = "email%20profile"
 
