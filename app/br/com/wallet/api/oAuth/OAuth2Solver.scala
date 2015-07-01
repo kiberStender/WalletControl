@@ -15,11 +15,6 @@ import play.api.mvc.Results._
 object OAuth2Solver {
   lazy val app: Application = Play.current
 
-  def getAuthorizationUrl: String => String => String => Option[String] = redirectUri => scope => state => for {
-    baseUrl <- app.configuration.getString("github.redirect.url")
-    authId <- app.configuration.getString("github.client.id")
-  } yield baseUrl.format(authId, redirectUri, scope, state)
-
   private def getToken: String => Future[Option[String]] = code => (for {
     authSec <- app.configuration.getString("github.client.secret")
     authId <- app.configuration.getString("github.client.id")
@@ -46,6 +41,6 @@ object OAuth2Solver {
         } else {
           Future.successful(BadRequest("Você não está logado"))
         }
-      ).getOrElse(Future.successful(BadRequest("Servidor não proveu os valores")))
+    ).getOrElse(Future.successful(BadRequest("Servidor não proveu os valores")))
   }
 }

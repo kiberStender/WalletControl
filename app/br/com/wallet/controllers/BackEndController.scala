@@ -3,11 +3,13 @@ package br.com.wallet.controllers
 import java.util.UUID
 
 import br.com.wallet.api.controller.ActionController
-import br.com.wallet.api.models.result.{Failure, Success}
+import br.com.wallet.api.models.result.{Success}
 import br.com.wallet.api.oAuth.OAuth2Solver
+import br.com.wallet.types.loginTypes.{GitHub, LoginTypes, Google}
+import play.api.{Configuration, Play}
 import play.api.http.HeaderNames
 import play.api.libs.ws.WS
-import play.api.mvc.Action
+import play.api.mvc.{RequestHeader, Action}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Play.current
 import scala.language.postfixOps
@@ -17,29 +19,28 @@ import scala.concurrent.Future
 /**
  * Created by sirkleber on 29/06/15.
  */
-object BackEndController extends ActionController{
+object BackEndController extends ActionController {
+
+  private def loginList(implicit req: RequestHeader): List[LoginTypes] = {
+    lazy val callbackUrl = routes.BackEndController.auth_(None, None).absoluteURL()
+    lazy val conf: Configuration = Play.current.configuration
+
+    List(Google(conf, callbackUrl), GitHub(conf, callbackUrl))
+  }
 
   def auth = Action.async { implicit req =>
     Future {
-      def result: Either[Option[(String, String)], String] = req.session.get("oauth-state") match {
-        case Some(token) => Right(token)
+      req.session.get("oauth-state") match {
+        case Some(token) => Ok(Success(token) toJson) as jsonApp
         case None =>
-          def callbackUrl = routes.BackEndController.auth_(None, None).absoluteURL()
           lazy val state = UUID.randomUUID().toString
-
-          Left {
-            OAuth2Solver.getAuthorizationUrl(callbackUrl)("repo")(state) match {
-              case Some(url) => Some((url, state))
-              case None => None
-            }
-          }
+          Ok (
+            Success(for {
+              ltype <- loginList
+              url <- ltype.url
+            } yield s"$url&state=$state") toJson
+          ).withSession("oauth-state"-> state) as jsonApp
       }
-
-      (result match {
-        case Right(token) => Ok(Success(token) toJson)
-        case Left(Some((url, state))) => Ok(Failure(url) toJson) withSession "oauth-state"-> state
-        case Left(None) => Ok(Failure("AuthKey was not provided") toJson)
-      }) as jsonApp
     }
   }
 
