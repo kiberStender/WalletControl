@@ -35,10 +35,11 @@ object BackEndController extends ActionController {
         case None =>
           lazy val state = UUID.randomUUID().toString
           Ok (
-            Success(for {
-              ltype <- loginList
-              url <- ltype.url
-            } yield s"$url&state=$state") toJson
+            Success(
+              for {
+                ltype <- loginList
+              } yield ltype authData state
+            ) toJson
           ).withSession("oauth-state"-> state) as jsonApp
       }
     }
