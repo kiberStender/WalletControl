@@ -3,7 +3,7 @@ package br.com.wallet.controllers
 import java.util.UUID
 
 import br.com.wallet.api.controller.ActionController
-import br.com.wallet.api.models.result.{Success}
+import br.com.wallet.api.models.result.{Success, Failure}
 import br.com.wallet.api.oAuth.OAuth2Solver
 import br.com.wallet.types.loginTypes.{GitHub, LoginTypes, Google}
 import play.api.{Configuration, Play}
@@ -31,7 +31,7 @@ object BackEndController extends ActionController {
   def auth = Action.async { implicit req =>
     Future {
       req.session.get("oauth-state") match {
-        case Some(token) => Ok(Success(token) toJson) as jsonApp
+        case Some(token) => Ok(Failure(token) toJson) as jsonApp
         case None =>
           lazy val state = UUID.randomUUID().toString
           Ok (
