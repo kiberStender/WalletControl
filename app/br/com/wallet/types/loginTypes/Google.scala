@@ -8,7 +8,7 @@ import play.api.Configuration
 case class Google(conf: Configuration, redirectUri: String) extends LoginTypes {
   def loginType: String = "google"
 
-  def scope: String = "email%20profile"
+  def scope: String = "email%20profile&response_type=code"
 
   def authUrl: String = "https://accounts.google.com/o/oauth2/auth"
 }
