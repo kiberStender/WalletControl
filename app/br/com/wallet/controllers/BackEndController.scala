@@ -9,7 +9,7 @@ import br.com.wallet.types.loginTypes.{GitHub, LoginTypes, Google}
 import play.api.{Configuration, Play}
 import play.api.http.HeaderNames
 import play.api.libs.ws.WS
-import play.api.mvc.{RequestHeader, Action}
+import play.api.mvc.{Action}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Play.current
 import scala.language.postfixOps
@@ -21,19 +21,19 @@ import scala.concurrent.Future
  */
 object BackEndController extends ActionController {
 
-  private def loginList(implicit req: RequestHeader): List[LoginTypes] = {
-    lazy val callbackUrl = routes.BackEndController.auth_(None, None).absoluteURL()
-    lazy val conf: Configuration = Play.current.configuration
-
-    List(Google(conf, callbackUrl), GitHub(conf, callbackUrl))
-  }
-
   def auth = Action.async { implicit req =>
     Future {
       req.session.get("oauth-state") match {
         case Some(token) => Ok(Failure(token) toJson) as jsonApp
         case None =>
           lazy val state = UUID.randomUUID().toString
+          lazy val loginList: List[LoginTypes] = {
+            lazy val callbackUrl = routes.BackEndController.auth_(None, None).absoluteURL()
+            lazy val conf: Configuration = Play.current.configuration
+
+            List(Google(conf, callbackUrl), GitHub(conf, callbackUrl))
+          }
+
           Ok (
             Success(
               for {
