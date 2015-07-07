@@ -2,6 +2,7 @@ package br.com.wallet.types.loginTypes
 
 import br.com.wallet.types.loginOption.LoginOption
 import play.api.Configuration
+import play.api.mvc.{Call, RequestHeader}
 
 /**
  * Created by sirkleber on 29/06/15.
@@ -13,9 +14,14 @@ trait LoginTypes {
   protected def secret: Option[String] = conf getString s"${loginType}.client.secret"
   protected def scope: String
   protected def authUrl: String
-  protected def redirectUri: String
+  protected def redirectUri: (String, Option[String], Option[String]) => Call
 
-  def authData: String => Option[LoginOption] = state => for {
+  def tokenUri: String
+
+  def authData(state: String)(implicit req: RequestHeader): Option[LoginOption] = for {
     clId <- clientId
-  } yield LoginOption(loginType, s"$authUrl?client_id=$clId&redirect_uri=$redirectUri&scope=$scope&state=$state")
+  } yield {
+      lazy val rUri = redirectUri(loginType, None, None).absoluteURL()
+      LoginOption(loginType, s"$authUrl?client_id=$clId&redirect_uri=$rUri&scope=$scope&state=$state")
+    }
 }
