@@ -25,6 +25,6 @@ object FrontEndController extends ActionController {
   }
 
   def logoff = Action.async { implicit req =>
-    Future.successful(Ok (views.html.index("Redirecting...")) withNewSession)
+    Future.successful(Redirect("/").withNewSession)
   }
 }
