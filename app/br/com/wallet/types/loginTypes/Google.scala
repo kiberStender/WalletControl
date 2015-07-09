@@ -8,7 +8,7 @@ import play.api.mvc.Call
  */
 case class Google(
   conf: Configuration, redirectUri:(String, Option[String], Option[String]) => Call
-) extends LoginTypes {
+) extends LoginType {
   def loginType: String = "google"
 
   def scope: String = "email%20profile&response_type=code"

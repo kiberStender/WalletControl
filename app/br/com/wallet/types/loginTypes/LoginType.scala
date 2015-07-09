@@ -7,7 +7,7 @@ import play.api.mvc.{Call, RequestHeader}
 /**
  * Created by sirkleber on 29/06/15.
  */
-trait LoginTypes {
+trait LoginType {
   protected val conf: Configuration
   protected def loginType: String
   protected def clientId: Option[String] = conf getString s"${loginType}.client.id"

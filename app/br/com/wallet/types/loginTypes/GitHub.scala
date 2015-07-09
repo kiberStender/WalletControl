@@ -8,7 +8,7 @@ import play.api.mvc.Call
  */
 case class GitHub(
   conf: Configuration, redirectUri:(String, Option[String], Option[String]) => Call
-) extends LoginTypes {
+) extends LoginType {
   override def loginType: String = "github"
 
   override def scope: String = "repo"
