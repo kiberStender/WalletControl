@@ -18,7 +18,7 @@ trait ActionController extends Controller {
 
   protected def jsonApp = "application/json"
 
-  protected def hash = "usuario"
+  protected def hash = "oauth_user"
 
   protected type ActP[A] = (A, Request[JsValue]) => Future[Result]
 

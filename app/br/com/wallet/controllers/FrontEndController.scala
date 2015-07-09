@@ -17,7 +17,7 @@ object FrontEndController extends ActionController {
 
   def spreadsheet = Action.async { request =>
     Future {
-      request.session.get("user") match {
+      request.session.get(hash) match {
         case Some(_) => Ok(views.html.spreadsheet(""))
         case None => Ok(views.html.index("Redirecting...")) withNewSession
       }
