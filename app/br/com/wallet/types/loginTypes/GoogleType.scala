@@ -17,7 +17,7 @@ case class GoogleType(clientId: Option[String], secret: Option[String]) extends 
 
 object GoogleType {
   def apply(conf: Configuration) = {
-    def provider = "google"
+    lazy val provider = "google"
     GoogleType((conf.getString(s"$provider.")), (conf.getString(s"$provider.")))
   }
 }
