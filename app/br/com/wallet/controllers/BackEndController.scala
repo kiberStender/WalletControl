@@ -5,11 +5,13 @@ import java.util.UUID
 import br.com.wallet.api.controller.ActionController
 import br.com.wallet.api.models.result.{Success}
 import br.com.wallet.types.loginOption.LoginOption
-import br.com.wallet.types.loginTypes.{GitHub, LoginTypes, Google}
+import br.com.wallet.types.loginTypes.{GithubType, LoginType, GoogleType}
+import br.com.wallet.types.oauthUser.OAuthUser
+import play.api.libs.json.Json
 import play.api.{Configuration, Play}
-import play.api.http.{MimeTypes, HeaderNames}
+import play.api.http.{HeaderNames}
 import play.api.libs.ws.WS
-import play.api.mvc.{Results, Action}
+import play.api.mvc.{Action}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Play.current
 import scala.language.postfixOps
@@ -20,75 +22,53 @@ import scala.concurrent.Future
  * Created by sirkleber on 29/06/15.
  */
 object BackEndController extends ActionController {
-  private implicit lazy val conf: Configuration = Play.current.configuration
 
-  private lazy val loginList: Map[String, LoginTypes] = {
-    lazy val callbackUrl = routes.BackEndController.login _
-
-    Map("google" -> Google(conf, callbackUrl), "github" -> GitHub(conf, callbackUrl))
+  private lazy val loginList: List[LoginType] = {
+    lazy val conf: Configuration = Play.current.configuration
+    List(GoogleType(conf), GithubType(conf))
   }
 
   def auth = Action.async { implicit req =>
-    def list: String => List[Option[LoginOption]] = state => for {
-      (_, ltype) <- loginList toList
-    } yield ltype authData state
+    lazy val callbackUrl = routes.BackEndController.login _
+
+    def list(state: String): List[Option[LoginOption]] = for {
+      ltype <- loginList
+    } yield ltype.authData((state, callbackUrl))
 
     Future {
-      req.session.get("oauth-state") match {
+      req.session.get(oauthStateSesion) match {
         case Some(token) => Ok (Success(list(token)) toJson) as jsonApp
         case None =>
           lazy val state: String = UUID.randomUUID().toString
-          Ok (Success(list(state)) toJson).withSession("oauth-state"-> state) as jsonApp
+          Ok (Success(list(state)) toJson).withSession(oauthStateSesion-> state) as jsonApp
       }
     }
   }
 
-  private def getToken: String => Future[Option[String]] = code => (for {
-    authSec <- conf.getString("github.client.secret")
-    authId <- conf.getString("github.client.id")
-  } yield {
-      def tokenResponse = WS.url("https://github.com/login/oauth/access_token").
-        withQueryString("client_id" -> authId, "client_secret" -> authSec, "code" -> code).
-        withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON).
-        post(Results.EmptyContent())
-
-      for {
-        response <- tokenResponse
-      } yield (response.json \ "access_token").asOpt[String]
-    }).getOrElse(Future(None))
-
   def login(provider: String, codeOpt: Option[String], stateOpt: Option[String]) = Action.async { implicit req =>
-    Future {
-      Ok(
-        (for {
-          code <- codeOpt
-          state <- stateOpt
-        } yield s"$provider -> $code -> $state").getOrElse("Isaew")
-      )
-    }
-  }
-
-  def auth_(codeOpt: Option[String], stateOpt: Option[String]) = Action.async { implicit req =>
-    Future {
-      (for {
-        code <- codeOpt
-        state <- stateOpt
-        oauthState <- req.session.get("oauth-state")
-      } yield if (oauthState == state) {
-          for {
-            accessToken <- getToken(code)
-          } yield Ok("Você está logado")
-        } else {
-          Future.successful(BadRequest("Você não está logado"))
-        }
-      ).getOrElse(Future.successful(BadRequest("Servidor não proveu os valores")))
-
-      Ok("")
-    }
+    (for {
+      loginType <- loginList find (_.provider == provider)
+      code <- codeOpt
+      state <- stateOpt
+      oauthState <- req.session.get(oauthStateSesion)
+    } yield if(state == oauthState) {
+        for {
+          fToken <- loginType getToken code
+        } yield (for {
+          token <- fToken
+        } yield {
+            def json = Json.toJson(OAuthUser("", state, code, token, loginType))
+            Redirect("/spreadsheet").withSession(oauthUserSession -> json.toString)
+          }
+        ).getOrElse(BadRequest("Provedor não autorizou"))
+      } else {
+        Future.successful(BadRequest("Você não está logado"))
+      }
+    ) getOrElse Future.successful(BadRequest("Servidor não proveu os valores"))
   }
 
   def success = Action.async { request =>
-    request.session.get("oauth-token").fold(Future.successful(Unauthorized("No way Jose"))) { authToken =>
+    request.session.get(oauthStateSesion).fold(Future.successful(Unauthorized("No way Jose"))) { authToken =>
       WS.url("https://api.github.com/user/repos").
         withHeaders(HeaderNames.AUTHORIZATION -> s"token $authToken").
         get().map { response =>
