@@ -19,7 +19,7 @@ object FrontEndController extends ActionController {
     Future {
       request.session.get(oauthUserSession) match {
         case Some(_) => Ok(views.html.spreadsheet(""))
-        case None => Ok(views.html.index("Redirecting...")) withNewSession
+        case None => Redirect("/") withNewSession
       }
     }
   }
