@@ -1,12 +1,12 @@
 package br.com.wallet.types.oauthUser
 
 import br.com.wallet.types.loginTypes.LoginType
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
 /**
  * Created by sirkleber on 12/07/15.
  */
-case class OAuthUser (user: String, state: String, code: String, actualLogin: LoginType)
+case class OAuthUser (user: String, state: String, code: String, token: JsValue, actualLogin: LoginType)
 
 object OAuthUser {
   implicit val writesUser = Json.writes[OAuthUser]
