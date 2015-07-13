@@ -1,15 +1,20 @@
 package br.com.wallet.types.loginTypes
 
 import br.com.wallet.types.loginOption.LoginOption
-import play.api.Configuration
+import play.api.{Application, Configuration}
+import play.api.http.{MimeTypes, HeaderNames}
 import play.api.libs.json._
-import play.api.mvc.{Call, RequestHeader}
+import play.api.libs.ws.WS
+import play.api.mvc.{Results, Call, RequestHeader}
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import scala.concurrent.Future
 
 /**
  * Created by sirkleber on 29/06/15.
  */
 sealed case class LoginType(
-  clientId: Option[String], secret: Option[String], provider: String, scope: String, authUrl: String, tokenUri: String
+  clientId: Option[String], secret: Option[String], provider: String, scope: String, authUrl: String, tokenUrl: String
 ) {
   def authData(
     tp: (String, (String, Option[String], Option[String]) => Call)
@@ -21,6 +26,20 @@ sealed case class LoginType(
         LoginOption(provider, s"$authUrl?client_id=$clId&redirect_uri=$rUri&scope=$scope&state=$state")
       }
   }
+
+  def getToken(code: String)(implicit current: Application): Future[Option[JsValue]] = (for {
+    authSec <- secret
+    authId <- clientId
+  } yield {
+      def tokenResponse = WS.url(tokenUrl).
+        withQueryString("client_id" -> authId, "client_secret" -> authSec, "code" -> code).
+        withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON).
+        post(Results.EmptyContent())
+
+      for {
+        response <- tokenResponse
+      } yield Some(response.json)
+  }).getOrElse(Future(None))
 }
 
 object LoginType {
@@ -35,7 +54,7 @@ object GithubType extends LoginType(
   def apply(conf: Configuration): LoginType = {
     lazy val clientId = conf getString s"$provider.client.id"
     lazy val secret = conf getString s"$provider.client.secret"
-    LoginType(clientId, secret, provider, scope, authUrl, tokenUri)
+    LoginType(clientId, secret, provider, scope, authUrl, tokenUrl)
   }
 }
 
@@ -46,6 +65,6 @@ object GoogleType extends LoginType(
   def apply(conf: Configuration): LoginType = {
     lazy val clientId = conf getString s"$provider.client.id"
     lazy val secret = conf getString s"$provider.client.secret"
-    LoginType(clientId, secret, provider, scope, authUrl, tokenUri)
+    LoginType(clientId, secret, provider, scope, authUrl, tokenUrl)
   }
 }
