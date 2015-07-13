@@ -8,7 +8,7 @@ main -> consoleIO(
       else
         document.querySelector("#loginTypes").innerHTML = ((seq.apply(@, result).fmap (x) ->
           {provider, authUri} = x
-          """<a href="#{authUri}">#{provider}</a><br/>"""
+          """<a class="mdl-badge" href="#{authUri}">#{provider}</a><br/>"""
         ).foldLeft "") (acc) -> (actual) -> acc + actual
     .catch alert
 )
