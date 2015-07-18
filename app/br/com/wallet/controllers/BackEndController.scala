@@ -3,15 +3,15 @@ package br.com.wallet.controllers
 import java.util.UUID
 
 import br.com.wallet.api.controller.ActionController
-import br.com.wallet.api.models.result.{Success}
+import br.com.wallet.api.models.result.Success
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.loginTypes.{GithubType, LoginType, GoogleType}
 import br.com.wallet.types.oauthUser.OAuthUser
 import play.api.libs.json.Json
 import play.api.{Configuration, Play}
-import play.api.http.{HeaderNames}
+import play.api.http.HeaderNames
 import play.api.libs.ws.WS
-import play.api.mvc.{Action}
+import play.api.mvc.Action
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Play.current
 import scala.language.postfixOps
@@ -52,8 +52,9 @@ object BackEndController extends ActionController {
       state <- stateOpt
       oauthState <- req.session.get(oauthStateSesion)
     } yield if(state == oauthState) {
+        lazy val callbackUrl = routes.BackEndController.login(loginType.provider, None, None).absoluteURL()
         for {
-          fToken <- loginType getToken code
+          fToken <- loginType.getToken(code, callbackUrl)
         } yield (for {
           token <- fToken
         } yield {
