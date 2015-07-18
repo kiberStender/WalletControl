@@ -5,7 +5,7 @@ import play.api.{Application}
 import play.api.http.{MimeTypes, HeaderNames}
 import play.api.libs.json._
 import play.api.libs.ws.WS
-import play.api.mvc.{Results, Call, RequestHeader}
+import play.api.mvc.{Call, RequestHeader}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
@@ -35,17 +35,15 @@ abstract class LoginType(
       }
   }
 
-  def getQString(authId: String, authSec: String, code: String): List[(String, String)]
+  def getQString(authId: String, authSec: String, code: String, redirectUri: String): String
 
-  def getToken(code: String)(implicit current: Application): Future[Option[JsValue]] = (for {
+  def getToken(code: String, redirectUri: String)(implicit current: Application): Future[Option[JsValue]] = (for {
     authSec <- secret
     authId <- clientId
   } yield {
-      println(getQString(authId, authSec, code))
       def tokenResponse = WS.url(tokenUrl).
-        withQueryString(getQString(authId, authSec, code): _*).
-        withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON).
-        post(Results.EmptyContent())
+        withHeaders(HeaderNames.CONTENT_TYPE -> MimeTypes.FORM, HeaderNames.ACCEPT -> MimeTypes.JSON).
+        post(getQString(authId, authSec, code, redirectUri))
 
       for {
         response <- tokenResponse

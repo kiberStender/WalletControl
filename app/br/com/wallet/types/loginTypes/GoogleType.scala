@@ -9,8 +9,8 @@ import play.api.libs.json.Json
 class GoogleType(
   _clientId: Option[String], _secret: Option[String], _provider: String, _scope: String, _authUrl: String, _tokenUrl: String
 ) extends LoginType(_clientId, _secret, _provider, _scope, _authUrl, _tokenUrl){
-  override def getQString(authId: String, authSec: String, code: String): List[(String, String)] = {
-    List("client_id" -> authId, "client_secret" -> authSec, "code" -> code, "grant_type" -> "authorization_code")
+  override def getQString(authId: String, authSec: String, code: String, redirectUri: String): String = {
+    s"client_id=$authId&client_secret=$authSec&code=$code&grant_type=authorization_code&redirect_uri=$redirectUri"
   }
 }
 

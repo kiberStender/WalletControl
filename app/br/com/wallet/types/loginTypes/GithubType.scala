@@ -8,8 +8,9 @@ import play.api.Configuration
 class GithubType(
   clientId: Option[String], secret: Option[String], provider: String, scope: String, authUrl: String, tokenUrl: String
 ) extends LoginType(clientId, secret, provider, scope, authUrl, tokenUrl){
-  override def getQString(authId: String, authSec: String, code: String): List[(String, String)] =
-    List("client_id" -> authId, "client_secret" -> authSec, "code" -> code)
+  override def getQString(authId: String, authSec: String, code: String, redirectUri: String): String = {
+    s"client_id=$authId&client_secret=$authSec&code=$code"
+  }
 }
 
 object GithubType {
