@@ -2,11 +2,14 @@ package br.com.wallet.types.loginTypes
 
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.logonType.LogonType
+import br.com.wallet.types.token.OauthToken
 import play.api.{Application}
 import play.api.http.{MimeTypes, HeaderNames}
 import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.mvc.{Call, RequestHeader}
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
@@ -39,17 +42,28 @@ abstract class LoginType {
 
   def mapToLogonType: JsValue => LogonType
 
-  def getToken(code: String, redirectUri: String)(implicit current: Application): Future[Option[LogonType]] = (for {
+  def getToken(code: String, redirectUri: String)(implicit current: Application): Future[Option[(OauthToken, LogonType)]] = (for {
     authSec <- secret
     authId <- clientId
   } yield {
-      def tokenResponse = WS.url(tokenUrl).
+      def tokenResponse: Future[OauthToken] = WS.url(tokenUrl).
         withHeaders(HeaderNames.CONTENT_TYPE -> MimeTypes.FORM, HeaderNames.ACCEPT -> MimeTypes.JSON).
-        post(getQString(authId, authSec, code, redirectUri))
+        post(getQString(authId, authSec, code, redirectUri)) map { wsResponse =>
+          lazy val json = wsResponse.json
+
+          OauthToken(
+            (json \ "access_token").as[String], (json \ "token_type").as[String], (json \ "expires_in").asOpt[Int]
+          )
+      }
+
+      def userInfo: String => Future[LogonType] = accessToken => WS.url(s"$userUrl?access_token=$accessToken").
+        withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON).
+        get() map { wsResponse => mapToLogonType(wsResponse.json) }
 
       for {
-        response <- tokenResponse
-      } yield Some(mapToLogonType(response.json))
+        token <- tokenResponse
+        user <- userInfo(token.accessToken)
+      } yield Some((token, user))
   }).getOrElse(Future(None))
 }
 
