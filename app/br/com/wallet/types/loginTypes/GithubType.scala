@@ -27,7 +27,14 @@ class GithubType(
 
   override def provider: String =  "github"
 
-  override def mapToLogonType: (JsValue) => LogonType = ???
+  override def mapToLogonType: (JsValue) => LogonType = json => {
+    //println(json)
+    def username: String = (json \ "login").as[String]
+    def usermail: String = (json \ "email").as[String]
+    def profilePicture: String = (json \ "avatar_url").as[String]
+
+    LogonType(username, usermail, provider)
+  }
 }
 
 object GithubType {
