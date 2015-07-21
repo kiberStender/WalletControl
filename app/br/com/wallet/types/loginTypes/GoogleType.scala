@@ -27,7 +27,14 @@ class GoogleType(
 
   override def provider: String = "google"
 
-  override def mapToLogonType: (JsValue) => LogonType = ???
+  override def mapToLogonType: (JsValue) => LogonType =  json => {
+    //println(json)
+    def username: String = (json \ "name").as[String]
+    def usermail: String = (json \ "email").as[String]
+    def profilePicture: String = (json \ "picture").as[String]
+
+    LogonType(username, usermail, profilePicture)
+  }
 }
 
 object GoogleType {
