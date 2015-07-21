@@ -9,7 +9,7 @@ import play.api.libs.json.JsValue
  */
 class GithubType(
   _clientId: Option[String], _secret: Option[String]) extends LoginType{
-  override def getQString(authId: String, authSec: String, code: String, redirectUri: String): String = {
+  override def getQString(authId: String, authSec: String, code: String, redirectUri: => String): String = {
     s"client_id=$authId&client_secret=$authSec&code=$code"
   }
 

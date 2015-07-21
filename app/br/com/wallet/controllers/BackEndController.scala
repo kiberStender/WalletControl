@@ -52,9 +52,8 @@ object BackEndController extends ActionController {
       state <- stateOpt
       oauthState <- req.session.get(oauthStateSesion)
     } yield if(state == oauthState) {
-        lazy val callbackUrl = routes.BackEndController.login(loginType.provider, None, None).absoluteURL()
         for {
-          fToken <- loginType.getToken(code, callbackUrl)
+          fToken <- loginType.getToken(code, routes.BackEndController.login(loginType.provider, None, None).absoluteURL())
         } yield (for {
           (token, user) <- fToken
         } yield {

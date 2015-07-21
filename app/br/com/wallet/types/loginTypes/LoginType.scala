@@ -38,11 +38,11 @@ abstract class LoginType {
       }
   }
 
-  def getQString(authId: String, authSec: String, code: String, redirectUri: String): String
+  def getQString(authId: String, authSec: String, code: String, redirectUri: => String): String
 
   def mapToLogonType: JsValue => LogonType
 
-  def getToken(code: String, redirectUri: String)(implicit current: Application): Future[Option[(OauthToken, LogonType)]] = (for {
+  def getToken(code: String, redirectUri: => String)(implicit current: Application): Future[Option[(OauthToken, LogonType)]] = (for {
     authSec <- secret
     authId <- clientId
   } yield {
