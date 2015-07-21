@@ -33,7 +33,7 @@ class GithubType(
     def usermail: String = (json \ "email").as[String]
     def profilePicture: String = (json \ "avatar_url").as[String]
 
-    LogonType(username, usermail, provider)
+    LogonType(username, usermail, profilePicture)
   }
 }
 
