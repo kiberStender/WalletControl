@@ -56,9 +56,9 @@ object BackEndController extends ActionController {
         for {
           fToken <- loginType.getToken(code, callbackUrl)
         } yield (for {
-          token <- fToken
+          (token, user) <- fToken
         } yield {
-            def json = Json.toJson(OAuthUser("", state, code, token, loginType))
+            def json = Json.toJson(OAuthUser(state, code, user, token, loginType))
             Redirect("/spreadsheet").withSession(oauthUserSession -> json.toString)
           }
         ).getOrElse(BadRequest("Provedor não autorizou"))
