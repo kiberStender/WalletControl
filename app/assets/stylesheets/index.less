@@ -1,21 +1,22 @@
 .demo-card-wide {
-  .mdl-card {
+  &.mdl-card {
     width: 512px;
   }
 
   > .mdl-card__title {
-    .google-type {
-      //background: url('http://d0od.wpengine.netdna-cdn.com/wp-content/uploads/2015/02/Screen-Shot-2015-02-11-at-23.45.05.png') center / cover;
-      background: blue;
+    &.google-type {
+      background: url('/assets/images/login/google.png') center / cover;
+      //background: blue center / cover;
     }
-    
-    .github-type {
-      //background: url('http://d0od.wpengine.netdna-cdn.com/wp-content/uploads/2015/02/Screen-Shot-2015-02-11-at-23.45.05.png') center / cover;
-      background: white;
+
+    &.github-type {
+      background: url('/assets/images/login/github.png') center / cover;
+      //background: white center / cover;
     }
-    
+
+    //background: url('/assets/images/login/google.png') center / cover;
     color: #fff;
-      height: 176px;
+    height: 176px;
   }
 
   > .mdl-card__menu {
