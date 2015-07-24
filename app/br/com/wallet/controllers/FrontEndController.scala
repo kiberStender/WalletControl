@@ -10,7 +10,7 @@ import scala.concurrent.Future
 /**
  * Created by sirkleber on 29/06/15.
  */
-object FrontEndController extends ActionController {
+class FrontEndController extends ActionController {
   def index = Action.async {
     Future.successful(Ok(views.html.index("Redirecting...")))
   }
@@ -18,7 +18,7 @@ object FrontEndController extends ActionController {
   def spreadsheet = Action.async { request =>
     Future {
       request.session.get(oauthUserSession) match {
-        case Some(_) => Ok(views.html.spreadsheet(""))
+        case Some(body) => Ok(views.html.spreadsheet("Spreadsheet", body))
         case None => Redirect("/") withNewSession
       }
     }

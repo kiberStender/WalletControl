@@ -21,7 +21,7 @@ import scala.concurrent.Future
 /**
  * Created by sirkleber on 29/06/15.
  */
-object BackEndController extends ActionController {
+class BackEndController extends ActionController {
 
   private lazy val loginList: List[LoginType] = {
     lazy val conf: Configuration = Play.current.configuration
@@ -31,9 +31,9 @@ object BackEndController extends ActionController {
   def auth = Action.async { implicit req =>
     lazy val callbackUrl = routes.BackEndController.login _
 
-    def list(state: String): List[Option[LoginOption]] = for {
+    def list(state: String): List[LoginOption] = (for {
       ltype <- loginList
-    } yield ltype.authData((state, callbackUrl))
+    } yield ltype.authData((state, callbackUrl))).filter(_.isDefined).map(_.get)
 
     Future {
       req.session.get(oauthStateSesion) match {

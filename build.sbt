@@ -1,9 +1,9 @@
-name := """WalletControl"""
+name := """walletControl"""
 
 version := "1.0-SNAPSHOT"
 
 lazy val commonSettings= Seq(
-  organization := "br.com.wallet",scalaVersion := "2.11.6",
+  organization := "br.com.wallet", scalaVersion := "2.11.6",
   scalacOptions := Seq("-language:_", "-deprecation", "-unchecked", "-feature", "-Xlint"),
   transitiveClassifiers in Global := Seq(Artifact.SourceClassifier),
   sources in (Compile, doc) := Nil,
@@ -15,13 +15,22 @@ lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .enablePlugins(PlayScala)
 
+includeFilter in (Assets, LessKeys.less) := "*.less"
+
 // scalaVersion := "2.11.6"
 
 libraryDependencies ++= Seq(
   jdbc,
-  anorm,
   cache,
   ws,
+  "com.typesafe.play" %% "anorm" % "2.4.0",
   "org.postgresql" % "postgresql" % "9.4-1200-jdbc41",
-  "com.github.nscala-time" %% "nscala-time" % "2.0.0"
+  "com.github.nscala-time" %% "nscala-time" % "2.0.0",
+  specs2 % Test
 )
+
+resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
+// Play provides two styles of routers, one expects its actions to be injected, the
+// other, legacy style, accesses its actions statically.
+routesGenerator := InjectedRoutesGenerator
