@@ -1,10 +1,11 @@
-{IOPerformer: {main, alertIO, consoleIO}, get, post, del, put, seq} = fpJS
+{IOPerformer: {main, consoleIO}, get, seq} = fpJS
 
 main -> consoleIO(
-  capitalize = (str) -> str.charAt(0).toUpperCase() + (str.slice 1).toLowerCase()
   get "/auth", true
     .then (x) ->
+      capitalize = (str) -> str.charAt(0).toUpperCase() + (str.slice 1).toLowerCase()
       {failed, result, description} = x
+
       if failed then window.location = "/spreadsheet"
       else document.querySelector(".jumbotron").innerHTML = ((seq.apply(@, result).fmap (x) ->
         {provider, authUri} = x
