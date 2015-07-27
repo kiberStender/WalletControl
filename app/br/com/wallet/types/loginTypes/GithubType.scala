@@ -1,6 +1,6 @@
 package br.com.wallet.types.loginTypes
 
-import br.com.wallet.types.logonType.LogonData$
+import br.com.wallet.types.logonType.LogonData
 import play.api.Configuration
 import play.api.libs.json.JsValue
 
@@ -27,7 +27,7 @@ class GithubType(
 
   override def provider: String =  "github"
 
-  override def mapToLogonType: (JsValue) => LogonData = json => {
+  override def mapToLogonData: JsValue => LogonData = json => {
     //println(json)
     def username: String = (json \ "login").as[String]
     def usermail: String = (json \ "email").as[String]
