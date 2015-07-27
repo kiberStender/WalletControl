@@ -2,6 +2,7 @@
 
 # --- !Ups
 
+
 CREATE TABLE public.accounttype (
   acctypeid VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
@@ -23,8 +24,7 @@ CREATE TABLE public.balance (
 
 CREATE TABLE public.accuser (
   accuserid VARCHAR(40) NOT NULL,
-  username VARCHAR(25) NOT NULL,
-  password VARCHAR(40) NOT NULL,
+  usermail VARCHAR(25) NOT NULL,
   CONSTRAINT accuserid PRIMARY KEY (accuserid)
 );
 
