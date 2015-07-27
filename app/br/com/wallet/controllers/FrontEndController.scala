@@ -15,7 +15,7 @@ import scala.concurrent.Future
  */
 class FrontEndController extends ActionController {
   def index = Action.async {
-    Future.successful(Ok(views.html.index("Redirecting...")))
+    Future.successful(Ok(views.html.index("Login")))
   }
 
   def spreadsheet = Action.async { request =>
