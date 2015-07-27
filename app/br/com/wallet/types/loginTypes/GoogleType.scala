@@ -1,6 +1,6 @@
 package br.com.wallet.types.loginTypes
 
-import br.com.wallet.types.logonType.LogonType
+import br.com.wallet.types.logonType.LogonData
 import play.api.Configuration
 import play.api.libs.json.{JsValue}
 
@@ -27,13 +27,13 @@ class GoogleType(
 
   override def provider: String = "google"
 
-  override def mapToLogonType: (JsValue) => LogonType =  json => {
+  override def mapToLogonData: (JsValue) => LogonData =  json => {
     //println(json)
     def username: String = (json \ "name").as[String]
     def usermail: String = (json \ "email").as[String]
     def profilePicture: String = (json \ "picture").as[String]
 
-    LogonType(username, usermail, profilePicture)
+    LogonData(username, usermail, profilePicture)
   }
 }
 

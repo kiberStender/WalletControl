@@ -1,15 +1,13 @@
 package br.com.wallet.types.loginTypes
 
 import br.com.wallet.types.loginOption.LoginOption
-import br.com.wallet.types.logonType.LogonType
+import br.com.wallet.types.logonType.LogonData
 import br.com.wallet.types.token.OauthToken
 import play.api.{Application}
 import play.api.http.{MimeTypes, HeaderNames}
-import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.mvc.{Call, RequestHeader}
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
@@ -40,9 +38,9 @@ abstract class LoginType {
 
   def getQString(authId: String, authSec: String, code: String, redirectUri: => String): String
 
-  def mapToLogonType: JsValue => LogonType
+  def mapToLogonData: JsValue => LogonData
 
-  def getToken(code: String, redirectUri: => String)(implicit current: Application): Future[Option[(OauthToken, LogonType)]] = (for {
+  def getToken(code: String, redirectUri: => String)(implicit current: Application): Future[Option[(OauthToken, LogonData)]] = (for {
     authSec <- secret
     authId <- clientId
   } yield {
@@ -56,9 +54,9 @@ abstract class LoginType {
           )
       }
 
-      def userInfo: String => Future[LogonType] = accessToken => WS.url(s"$userUrl?access_token=$accessToken").
+      def userInfo: String => Future[LogonData] = accessToken => WS.url(s"$userUrl?access_token=$accessToken").
         withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON).
-        get() map { wsResponse => mapToLogonType(wsResponse.json) }
+        get() map { wsResponse => mapToLogonData(wsResponse.json) }
 
       for {
         token <- tokenResponse
