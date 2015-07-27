@@ -3,7 +3,7 @@ package br.com.wallet.types.loginTypes
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.logonType.LogonData
 import br.com.wallet.types.token.OauthToken
-import play.api.{Application}
+import play.api.Application
 import play.api.http.{MimeTypes, HeaderNames}
 import play.api.libs.ws.WS
 import play.api.mvc.{Call, RequestHeader}

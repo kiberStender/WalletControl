@@ -2,7 +2,7 @@ package br.com.wallet.types.loginTypes
 
 import br.com.wallet.types.logonType.LogonData
 import play.api.Configuration
-import play.api.libs.json.{JsValue}
+import play.api.libs.json.JsValue
 
 /**
  * Created by sirkleber on 13/07/15.
