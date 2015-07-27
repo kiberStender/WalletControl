@@ -10,6 +10,7 @@ GET     /_oauth_callback/:provider  br.com.wallet.controllers.BackEndController.
 GET     /                           br.com.wallet.controllers.FrontEndController.index
 GET     /spreadsheet                br.com.wallet.controllers.FrontEndController.spreadsheet
 GET     /logout                     br.com.wallet.controllers.FrontEndController.logoff
+GET     /getData                    br.com.wallet.controllers.FrontEndController.getData
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

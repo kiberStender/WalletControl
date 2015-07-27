@@ -66,15 +66,4 @@ class BackEndController extends ActionController {
       }
     ) getOrElse Future.successful(BadRequest("Servidor não proveu os valores"))
   }
-
-  def success = Action.async { request =>
-    request.session.get(oauthStateSesion).fold(Future.successful(Unauthorized("No way Jose"))) { authToken =>
-      WS.url("https://api.github.com/user/repos").
-        withHeaders(HeaderNames.AUTHORIZATION -> s"token $authToken").
-        get().map { response =>
-        Ok(response.json)
-      }
-    }
-  }
-
 }

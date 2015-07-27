@@ -1,5 +1,4 @@
-@import br.com.wallet.types.oauthUser.OAuthUser
-@(message: String, logedUser: OAuthUser)
+@(message: String)
 
 @main(message) {
   <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.1/material.indigo-pink.min.css" />
@@ -32,9 +31,9 @@
     <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
       <header class="demo-drawer-header">
 
-        <img src="@logedUser.logonType.profilePicture" class="demo-avatar">
+        <img id="logedUserProfile" class="demo-avatar">
         <div class="demo-avatar-dropdown">
-          <span>Hello @logedUser.logonType.username</span>
+          <span id="logedUsername"></span>
           <div class="mdl-layout-spacer"></div>
 
           <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
@@ -42,7 +41,7 @@
           </button>
 
           <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
-            <button class="mdl-menu__item">Hello @logedUser.logonType.usermail</button>
+            <button class="mdl-menu__item" id="logedUsermail"></button>
             <button class="mdl-menu__item">info at domain.net</button>
             <button class="mdl-menu__item">Add another account...</button>
           </ul>
@@ -67,4 +66,5 @@
   </div>
 
   <script src="https://storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script>
+  <script src="@routes.Assets.at("javascripts/spreadsheet.js")" type="text/javascript"></script>
 }
