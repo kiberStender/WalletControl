@@ -12,8 +12,8 @@ import scala.concurrent.Future
  * Created by sirkleber on 4/6/15.
  */
 trait Dao {
-  protected def queryRunnerSingle[T](query: String)(parser: RowParser[T])(prmts: NamedParameter*): Future[T] = Future {
-    DB.withConnection {implicit conn => SQL(query).on(prmts: _*).as(parser.single)}
+  protected def queryRunnerSingle[T](query: String)(parser: RowParser[T])(prmts: NamedParameter*): Future[Option[T]] = Future {
+    DB.withConnection {implicit conn => SQL(query).on(prmts: _*).as(parser.singleOpt)}
   }
 
   protected def queryRunnerMany[T](query: String)(parser: RowParser[T])(prmts: NamedParameter*): Future[List[T]] = Future {
