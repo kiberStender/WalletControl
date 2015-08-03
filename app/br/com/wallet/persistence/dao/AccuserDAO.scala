@@ -9,13 +9,13 @@ import anorm.SqlParser._
  */
 object AccuserDAO extends Dao {
 
-  def getAccusers(accuserid: String) = queryRunnerSingle(
-    "Select count(usermail) from accuser where usermail = {usermail}"
-  )(int("count"))("accuserid" -> accuserid).map(_ > 0)
+  def getAccusers(usermail: String) = queryRunnerSingle(
+    "Select accuserid from accuser where usermail = {usermail}"
+  )(str("accuserid"))("usermail" -> usermail)
 
   def insertAccuser(useracc: AccuserDto) = useracc match {
     case AccuserDto(id, mail) =>
-      lazy val query = "Insert into accuser(accuserid, usermail) values({accuserid, usermail})"
+      lazy val query = "Insert into accuser(accuserid, usermail) values({accuserid}, {usermail})"
       queryUpdate(query)("accuserid" -> id, "usermail" -> mail)
   }
 }
