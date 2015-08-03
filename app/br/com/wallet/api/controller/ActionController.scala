@@ -20,19 +20,4 @@ trait ActionController extends Controller {
 
   protected def oauthUserSession = "oauth_user"
   protected def oauthStateSesion = "oauth_state"
-
-  protected type ActP[A] = (A, Request[JsValue]) => Future[Result]
-
-  protected def post(f: (Option[String], Request[JsValue]) => Future[Result]): Action[JsValue] = Action.async(parse.json) {
-    req => f(req.session.get(oauthUserSession), req)
-  }
-
-  protected def getAction(f: AccUser => JsObject) = Action.async { request =>
-    Future {
-      Ok(request.session.get(oauthUserSession) match {
-        case None => Failure("Não logado") toJson
-        case Some(us) => f((Json parse us).as[AccUser])
-      }) as jsonApp
-    }
-  }
 }
