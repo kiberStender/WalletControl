@@ -9,8 +9,6 @@ import br.com.wallet.types.loginTypes.{GithubType, LoginType, GoogleType}
 import br.com.wallet.types.oauthUser.OAuthUser
 import play.api.libs.json.Json
 import play.api.{Configuration, Play}
-import play.api.http.HeaderNames
-import play.api.libs.ws.WS
 import play.api.mvc.Action
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Play.current

@@ -1,10 +1,14 @@
 package br.com.wallet.types.loginTypes
 
+import br.com.wallet.persistence.dao.AccuserDAO
+import br.com.wallet.persistence.dto.AccuserDto
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.logonType.LogonData
 import br.com.wallet.types.token.OauthToken
+import org.joda.time.DateTime
 import play.api.Application
 import play.api.http.{MimeTypes, HeaderNames}
+import play.api.libs.Codecs
 import play.api.libs.ws.WS
 import play.api.mvc.{Call, RequestHeader}
 import play.api.libs.json._
@@ -58,9 +62,23 @@ abstract class LoginType {
         withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON).
         get() map { wsResponse => mapToLogonData(wsResponse.json) }
 
+      def data: Option[String] => LogonData => Future[LogonData] = id => user => id match {
+        case Some(accuserid) => user match {
+          case LogonData(_, username, usermail, pic) => Future(LogonData(accuserid, username, usermail, pic))
+        }
+        case None => for {
+          accuserid <- Future(Codecs.sha1(s"${user.usermail}-${new DateTime()}"))
+          _ <- AccuserDAO.insertAccuser(AccuserDto(accuserid, user.usermail))
+        } yield user match {
+            case LogonData(_, username, usermail, pic) => LogonData(accuserid, username, usermail, pic)
+          }
+      }
+
       for {
         token <- tokenResponse
         user <- userInfo(token.accessToken)
+        optId <- AccuserDAO.getAccusers(user.usermail)
+        oauthUser <- data(optId)(user)
       } yield Some((token, user))
   }).getOrElse(Future(None))
 }
