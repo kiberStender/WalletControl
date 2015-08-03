@@ -23,6 +23,7 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
   ws,
+  evolutions,
   "com.typesafe.play" %% "anorm" % "2.4.0",
   "org.postgresql" % "postgresql" % "9.4-1200-jdbc41",
   "com.github.nscala-time" %% "nscala-time" % "2.0.0",
