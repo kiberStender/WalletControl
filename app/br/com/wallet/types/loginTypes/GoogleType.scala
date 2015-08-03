@@ -33,7 +33,7 @@ class GoogleType(
     def usermail: String = (json \ "email").as[String]
     def profilePicture: String = (json \ "picture").as[String]
 
-    LogonData(username, usermail, profilePicture)
+    LogonData("", username, usermail, profilePicture)
   }
 }
 
