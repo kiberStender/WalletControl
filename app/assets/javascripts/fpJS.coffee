@@ -457,7 +457,7 @@ fpJS = do ->
     #utils.try_
     _try, success, failure
     #IO/Promises
-    IO, query, IOPerformer, websocket
+    IO, query, IOPerformer, webSocket
     #Ajax
     get, post, del, put
     #State
