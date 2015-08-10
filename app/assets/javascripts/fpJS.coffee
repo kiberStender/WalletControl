@@ -409,7 +409,7 @@ fpJS = do ->
       ws.onerror = (evt) -> (new Promise (rs, rj) -> try rs evt catch e then rj e).then (msg) -> fn msg, new Sender ws
       new FpWebSocket ws
     @sendMessage = (msg) ->
-      ws.sendMessage msg
+      ws.send msg
       new FpWebSocket ws
     
   webSocket = (conn, protocols) -> new FpWebSocket new WebSocket conn, protocols
