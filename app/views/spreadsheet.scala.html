@@ -63,9 +63,25 @@
         <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons">help_outline</i></a>
       </nav>
     </div>
-    <main class="mdl-layout__content mdl-color--grey-100"></main>
+    <main class="mdl-layout__content mdl-color--grey-100">
+      <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp full-width" id="spreadsheet">
+        <thead>
+        <tr>
+          <th class="mdl-data-table__cell--non-numeric">Data</th>
+          <th>Descrição</th>
+          <th>Entradas</th>
+          <th>Saídas</th>
+          <th>Saldo</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </main>
   </div>
 
   <script src="https://storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script>
+  <script src="@routes.Assets.at("javascripts/request/AbstractRequest.js")" type="text/javascript"></script>
+  <script src="@routes.Assets.at("javascripts/request/SpreadsheetRequest.js")" type="text/javascript"></script>
   <script src="@routes.Assets.at("javascripts/spreadsheet.js")" type="text/javascript"></script>
 }
