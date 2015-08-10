@@ -1,0 +1,1 @@
+class SpreadsheetRequest extends AbstractRequest then constructor: -> super "spreadsheet"

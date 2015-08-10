@@ -1,3 +1,3 @@
 class AbstractRequest
-  stringify: -> throw new Error "AbstractRequest.stringfy"
-
+  constructor: (@requestType) ->
+  stringify: -> JSON.stringify @
