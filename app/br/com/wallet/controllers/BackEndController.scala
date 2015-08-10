@@ -4,12 +4,13 @@ import java.util.UUID
 
 import br.com.wallet.api.controller.ActionController
 import br.com.wallet.api.models.result.Success
+import br.com.wallet.types.actor.SpreadsheetActor
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.loginTypes.{GithubType, LoginType, GoogleType}
 import br.com.wallet.types.oauthUser.OAuthUser
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Play}
-import play.api.mvc.Action
+import play.api.mvc.{WebSocket, Action}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Play.current
 import scala.language.postfixOps
@@ -63,5 +64,20 @@ class BackEndController extends ActionController {
         Future.successful(BadRequest("Você não está logado"))
       }
     ) getOrElse Future.successful(BadRequest("Servidor não proveu os valores"))
+  }
+
+  def spreadsheetWs(state: String) = WebSocket.tryAcceptWithActor[JsValue, JsValue] { request =>
+    Future {
+      request.session.get(oauthUserSession) match {
+        case None => Left(Forbidden)
+        case Some(body) =>
+          def oauthuser = Json.parse(body).as[OAuthUser]
+          if (oauthuser.state == state) {
+            Right(SpreadsheetActor.props)
+          } else {
+            Left(Forbidden)
+          }
+      }
+    }
   }
 }
