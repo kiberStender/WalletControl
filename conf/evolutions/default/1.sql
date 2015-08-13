@@ -3,12 +3,20 @@
 # --- !Ups
 
 
+CREATE TABLE public.accuser (
+  accuserid VARCHAR(40) NOT NULL,
+  usermail VARCHAR(25) NOT NULL,
+  CONSTRAINT accuserid PRIMARY KEY (accuserid)
+);
+
+
 CREATE TABLE public.accounttype (
   acctypeid VARCHAR(40) NOT NULL,
+  accuserid VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
-  closingday DATE NOT NULL,
+  closingday CHAR(2) NOT NULL,
   accname VARCHAR(25) NOT NULL,
-  CONSTRAINT accounttypeid PRIMARY KEY (acctypeid)
+  CONSTRAINT accounttypeid PRIMARY KEY (acctypeid, accuserid)
 );
 
 
@@ -22,23 +30,22 @@ CREATE TABLE public.balance (
 );
 
 
-CREATE TABLE public.accuser (
-  accuserid VARCHAR(40) NOT NULL,
-  usermail VARCHAR(25) NOT NULL,
-  CONSTRAINT accuserid PRIMARY KEY (accuserid)
-);
-
-
 CREATE TABLE public.item (
   itemid VARCHAR(40) NOT NULL,
-  userid VARCHAR(40) NOT NULL,
   acctype VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
   purchaseDate DATE NOT NULL,
   trtype VARCHAR(3) NOT NULL,
-  CONSTRAINT itemid PRIMARY KEY (itemid, userid, acctype)
+  CONSTRAINT itemid PRIMARY KEY (itemid, acctype)
 );
 
+
+ALTER TABLE public.accounttype ADD CONSTRAINT accuser_accounttype_fk
+FOREIGN KEY (accuserid)
+REFERENCES public.accuser (accuserid)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
 
 ALTER TABLE public.item ADD CONSTRAINT accounttype_item_fk
 FOREIGN KEY (acctype)
@@ -50,13 +57,6 @@ NOT DEFERRABLE;
 ALTER TABLE public.balance ADD CONSTRAINT accounttype_balance_fk
 FOREIGN KEY (typeid)
 REFERENCES public.accounttype (acctypeid)
-ON DELETE NO ACTION
-ON UPDATE NO ACTION
-NOT DEFERRABLE;
-
-ALTER TABLE public.item ADD CONSTRAINT accuser_item_fk
-FOREIGN KEY (userid)
-REFERENCES public.accuser (accuserid)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION
 NOT DEFERRABLE;
