@@ -10,10 +10,10 @@ import anorm.SqlParser._
 object AccountTypeDAO extends Dao {
   def getByUserId(userid: String) = queryRunnerSingle("Select * from accounttype where userid = {userid}")(
   for {
-    accountTypeId <- str("")
-    accName <- str("")
-    description <- str("")
-    closingDay <- str("")
+    accountTypeId <- str("acctypeid")
+    accName <- str("accname")
+    description <- str("description")
+    closingDay <- str("closingday")
     items <- ItemDAO.getItemsByAccountType(accountTypeId)
   } yield accName match {
     case "Wallet" => Wallet(accountTypeId, closingDay, items, Nil)
