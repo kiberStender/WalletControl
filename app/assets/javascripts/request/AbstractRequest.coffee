@@ -1,5 +1,5 @@
 class AbstractRequest
-  constructor: (@requestType, @userid, @body = {}) ->
+  constructor: (@requestType, @body = "") ->
   stringify: -> JSON.stringify @
 
 root = exports ? window

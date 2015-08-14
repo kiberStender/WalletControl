@@ -1,12 +1,12 @@
-class SpreadsheetRequest extends AbstractRequest then constructor: (userid, body) -> super "spreadsheet", userid, body
+class SpreadsheetRequest extends AbstractRequest then constructor: (userid, method, data) -> super "spreadsheet", {userid, method, data}
 
-class SpreadsheetRequestGet extends SpreadsheetRequest then constructor: (userid) -> super userid, {method: "get"}
+class SpreadsheetRequestGet extends SpreadsheetRequest then constructor: (userid) -> super userid, "get", {}
 
-class SpreadsheetRequestPut extends SpreadsheetRequest then constructor: (userid, data) -> super userid, {method: "put", data}
+class SpreadsheetRequestPut extends SpreadsheetRequest then constructor: (userid, data) -> super userid, "put", data
 
-class SpreadsheetRequestDelete extends SpreadsheetRequest then constructor: (userid, data) -> super userid, {method: "delete", data}
+class SpreadsheetRequestDelete extends SpreadsheetRequest then constructor: (userid, data) -> super userid, "delete", data
 
-class SpreadsheetRequestUpdate extends SpreadsheetRequest then constructor: (userid, data) -> super userid, {method: "update", data}
+class SpreadsheetRequestUpdate extends SpreadsheetRequest then constructor: (userid, data) -> super userid, "update", data
 
 root = exports ? window
 root.SpreadsheetRequestGet = SpreadsheetRequestGet
