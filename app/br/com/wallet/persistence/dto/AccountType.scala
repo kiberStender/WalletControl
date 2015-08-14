@@ -25,7 +25,7 @@ final case class CreditCard(
 ) extends AccountType{
   override def accName: String = "CreditCard"
 
-  override def description: String = "Cartão magnético contendo dinheiro virtual proveniente de uma conta bancária"
+  override def description: String = "Cartão de crédito"
 }
 
 final case class CustomAccount(
