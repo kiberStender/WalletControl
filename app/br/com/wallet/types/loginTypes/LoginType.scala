@@ -79,7 +79,7 @@ abstract class LoginType {
         user <- userInfo(token.accessToken)
         optId <- AccuserDAO.getAccusers(user.usermail)
         oauthUser <- data(optId)(user)
-      } yield Some((token, user))
+      } yield Some((token, oauthUser))
   }).getOrElse(Future(None))
 }
 
