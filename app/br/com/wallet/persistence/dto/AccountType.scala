@@ -15,15 +15,15 @@ sealed trait AccountType {
 final case class Wallet(
   accountTypeId: String, closingDay: String, items: Seq[Item], balances: Seq[Balance]
 ) extends AccountType{
-  override def accName: String = "Carteira"
+  override def accName: String = "Wallet"
 
-  override def description: String = "Carteira simples que anda com o usuário contendo dinheiro físico"
+  override def description: String = "Carteira"
 }
 
 final case class CreditCard(
   accountTypeId: String, closingDay: String, items: Seq[Item], balances: Seq[Balance]
 ) extends AccountType{
-  override def accName: String = "Cartão de crédito"
+  override def accName: String = "CreditCard"
 
   override def description: String = "Cartão magnético contendo dinheiro virtual proveniente de uma conta bancária"
 }
