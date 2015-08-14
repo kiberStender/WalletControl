@@ -1,6 +1,7 @@
 package br.com.wallet.persistence.dao
 
 import br.com.wallet.persistence.dto.{CustomAccount, CreditCard, Wallet}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import anorm.SqlParser._
 
@@ -14,6 +15,7 @@ object AccountTypeDAO extends Dao {
     accName <- str("accname")
     description <- str("description")
     closingDay <- str("closingday")
+  } yield for {
     items <- ItemDAO.getItemsByAccountType(accountTypeId)
   } yield accName match {
     case "Wallet" => Wallet(accountTypeId, closingDay, items, Nil)

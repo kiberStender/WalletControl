@@ -1,9 +1,11 @@
 package br.com.wallet.persistence.dto
 
+import play.api.libs.json.Json
+
 /**
  * Created by sirkleber on 13/08/15.
  */
-sealed trait AccountType {
+sealed abstract class AccountType {
   def accountTypeId: String
   def description: String
   def accName: String
@@ -31,3 +33,7 @@ final case class CreditCard(
 final case class CustomAccount(
   accountTypeId: String, accName: String, description: String, closingDay: String, items: Seq[Item], balances: Seq[Balance]
 ) extends AccountType
+
+object CustomAccount {
+  implicit def formats = Json.format[CustomAccount]
+}

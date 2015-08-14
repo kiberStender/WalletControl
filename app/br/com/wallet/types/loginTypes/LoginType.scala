@@ -1,7 +1,7 @@
 package br.com.wallet.types.loginTypes
 
 import br.com.wallet.persistence.dao.AccuserDAO
-import br.com.wallet.persistence.dto.AccuserDto
+import br.com.wallet.persistence.dto.Accuser
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.logonType.LogonData
 import br.com.wallet.types.token.OauthToken
@@ -68,7 +68,7 @@ abstract class LoginType {
         }
         case None => for {
           accuserid <- Future(Codecs.sha1(s"${user.usermail}-${new DateTime()}"))
-          _ <- AccuserDAO.insertAccuser(AccuserDto(accuserid, user.usermail))
+          _ <- AccuserDAO.insertAccuser(Accuser(accuserid, user.usermail))
         } yield user match {
             case LogonData(_, username, usermail, pic) => LogonData(accuserid, username, usermail, pic)
           }
