@@ -7,7 +7,9 @@ import play.api.libs.json.{Json, Format}
 /**
  * Created by sirkleber on 13/08/15.
  */
-case class Item(itemId: String, description: String, purchaseDate: Date, trtType: String) extends Dto
+case class Item(itemId: String, description: String, purchaseDate: Date, trtType: String) extends Dto {
+  override def toString = s"{itemId: $itemId, description: $description, purchaseDate: $purchaseDate, trtType: $trtType}"
+}
 
 object Item {
   implicit def formatter: Format[Item] = Json.format[Item]
