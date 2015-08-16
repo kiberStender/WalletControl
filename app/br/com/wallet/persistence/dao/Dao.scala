@@ -16,7 +16,15 @@ trait Dao {
     DB.withConnection {implicit conn => SQL(query).on(prmts: _*).as(parser.singleOpt)}
   }
 
+  protected def queryRunnerSingleS[T](query: String)(parser: RowParser[T])(prmts: NamedParameter*): Option[T] = {
+    DB.withConnection {implicit conn => SQL(query).on(prmts: _*).as(parser.singleOpt)}
+  }
+
   protected def queryRunnerMany[T](query: String)(parser: RowParser[T])(prmts: NamedParameter*): Future[List[T]] = Future {
+    DB.withConnection {implicit conn => SQL(query).on(prmts: _*).as(parser *)}
+  }
+
+  protected def queryRunnerManyS[T](query: String)(parser: RowParser[T])(prmts: NamedParameter*): List[T] = {
     DB.withConnection {implicit conn => SQL(query).on(prmts: _*).as(parser *)}
   }
 
