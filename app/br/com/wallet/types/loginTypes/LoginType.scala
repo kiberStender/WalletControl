@@ -1,7 +1,7 @@
 package br.com.wallet.types.loginTypes
 
-import br.com.wallet.persistence.dao.AccuserDAO
-import br.com.wallet.persistence.dto.Accuser
+import br.com.wallet.persistence.dao.{AccountTypeDAO, AccuserDAO}
+import br.com.wallet.persistence.dto.{Wallet, Accuser}
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.logonType.LogonData
 import br.com.wallet.types.token.OauthToken
@@ -40,9 +40,9 @@ abstract class LoginType {
       }
   }
 
-  def getQString(authId: String, authSec: String, code: String, redirectUri: => String): String
+  protected def getQString(authId: String, authSec: String, code: String, redirectUri: => String): String
 
-  def mapToLogonData: JsValue => LogonData
+  protected def mapToLogonData: JsValue => LogonData
 
   def getToken(code: String, redirectUri: => String)(implicit current: Application): Future[Option[(OauthToken, LogonData)]] = (for {
     authSec <- secret
@@ -68,7 +68,9 @@ abstract class LoginType {
         }
         case None => for {
           accuserid <- Future(Codecs.sha1(s"${user.usermail}-${new DateTime()}"))
+          accounttypeid <- Future(Codecs.sha1(s"${user.usermail}-${new DateTime()}"))
           _ <- AccuserDAO.insertAccuser(Accuser(accuserid, user.usermail))
+          _ <- AccountTypeDAO.insert(Wallet(accounttypeid, "30", Nil, Nil))(accuserid)
         } yield user match {
             case LogonData(_, username, usermail, pic) => LogonData(accuserid, username, usermail, pic)
           }
