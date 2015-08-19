@@ -1,6 +1,6 @@
 package br.com.wallet.persistence.dao
 
-import br.com.wallet.persistence.dto.{AccountType, CustomAccount}
+import br.com.wallet.persistence.dto.AccountType
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import anorm.SqlParser._
@@ -17,11 +17,11 @@ object AccountTypeDAO extends Dao {
       "Insert into accounttype(acctypeid, accuserid, description, closingday, accname) values({id}, {userid}, {desc}, {closingday}, {accname})"
     )("id" -> id, "userid" -> userid, "accname" -> accName, "desc" -> desc, "closingday" -> closingDay)
   }
-  def getByUserId(userid: String): Future[List[CustomAccount]] = queryRunnerMany("Select * from accounttype where accuserid = {userid}")(for {
+  def getByUserId(userid: String): Future[List[AccountType]] = queryRunnerMany("Select * from accounttype where accuserid = {userid}")(for {
     accountTypeId <- str("acctypeid")
     accName <- str("accname")
     description <- str("description")
     closingDay <- str("closingday")
-  } yield CustomAccount(accountTypeId, accName, description, closingDay, ItemDAO.getItemsByAccountType(accountTypeId), Nil)
+  } yield AccountType(accountTypeId, accName, description, closingDay, ItemDAO.getItemsByAccountType(accountTypeId), Nil)
   )("userid" -> userid)
 }
