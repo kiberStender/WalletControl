@@ -58,29 +58,27 @@ abstract class LoginType {
           )
       }
 
-      def userInfo: String => Future[LogonData] = accessToken => WS.url(s"$userUrl?access_token=$accessToken").
-        withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON).
-        get() map { wsResponse => mapToLogonData(wsResponse.json) }
+      def userInfo: String => Future[LogonData] = {
+        case accessToken => WS.url(s"$userUrl?access_token=$accessToken")
+          .withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON)
+          .get() map { wsResponse => mapToLogonData(wsResponse.json) }
+      }
 
-      def data: Option[String] => LogonData => Future[LogonData] = id => user => id match {
-        case Some(accuserid) => user match {
-          case LogonData(_, username, usermail, pic) => Future(LogonData(accuserid, username, usermail, pic))
-        }
-        case None => for {
-          accuserid <- Future(Codecs.sha1(s"${user.usermail}-${new DateTime()}"))
-          accounttypeid <- Future(Codecs.sha1(s"${user.usermail}-${new DateTime()}"))
-          _ <- AccuserDAO.insertAccuser(Accuser(accuserid, user.usermail))
+      def data: (Option[String], LogonData) => Future[LogonData] = {
+        case (Some(userid), LogonData(_, username, usermail, pic)) => Future(LogonData(userid, username, usermail, pic))
+        case (None, LogonData(_, username, usermail, pic)) => for {
+          accuserid <- Future(Codecs.sha1(s"$usermail-${new DateTime()}"))
+          accounttypeid <- Future(Codecs.sha1(s"$usermail-${new DateTime()}"))
+          _ <- AccuserDAO.insertAccuser(Accuser(accuserid, usermail))
           _ <- AccountTypeDAO.insert(AccountType(accounttypeid, "Wallet", "Carteira", "30", Nil, Nil))(accuserid)
-        } yield user match {
-            case LogonData(_, username, usermail, pic) => LogonData(accuserid, username, usermail, pic)
-          }
+        } yield LogonData(accuserid, username, usermail, pic)
       }
 
       for {
         token <- tokenResponse
         user <- userInfo(token.accessToken)
         optId <- AccuserDAO.getAccusers(user.usermail)
-        oauthUser <- data(optId)(user)
+        oauthUser <- data(optId, user)
       } yield Some((token, oauthUser))
   }).getOrElse(Future(None))
 }
