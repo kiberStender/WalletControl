@@ -1,7 +1,6 @@
 package br.com.wallet.persistence.dao
 
 import br.com.wallet.persistence.dto.AccountType
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import anorm.SqlParser._
 
@@ -12,8 +11,8 @@ import scala.concurrent.Future
  */
 object AccountTypeDAO extends Dao {
 
-  def insert(acctype: AccountType)(userid: String) = acctype match {
-    case AccountType(id, accName, desc, closingDay, _, _) => queryUpdate(
+  def insert: AccountType => String => Future[Unit] = {
+    case AccountType(id, accName, desc, closingDay, _, _) => userid => queryUpdate(
       "Insert into accounttype(acctypeid, accuserid, description, closingday, accname) values({id}, {userid}, {desc}, {closingday}, {accname})"
     )("id" -> id, "userid" -> userid, "accname" -> accName, "desc" -> desc, "closingday" -> closingDay)
   }
