@@ -1,4 +1,4 @@
-{IOPerformer: {main, consoleIO}, get, seq} = fpJS
+{IOPerformer: {main, consoleIO}, get, arrayToSeq, seq} = fpJS
 
 main -> consoleIO(
   get "/auth", true
@@ -7,7 +7,7 @@ main -> consoleIO(
       {failed, result, description} = x
 
       if failed then window.location = "/spreadsheet"
-      else document.querySelector(".jumbotron").innerHTML = ((seq.apply(@, result).fmap (x) ->
+      else document.querySelector(".jumbotron").innerHTML = (((arrayToSeq result).fmap (x) ->
         {provider, authUri} = x
         """
            <p>
