@@ -15,7 +15,8 @@ object ItemDAO extends Dao {
   )(for {
     itemId <- str("itemid")
     description <- str("description")
+    value <- double("itemvalue")
     purchaseDate <- date("purchaseDate")
     trtType <- str("trtype")
-  } yield Item(itemId, description, purchaseDate, trtType))("acctypeid" -> acctypeId)
+  } yield Item(itemId, description, value, purchaseDate, trtType))("acctypeid" -> acctypeId)
 }

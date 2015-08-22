@@ -6,6 +6,9 @@ import anorm.SqlParser._
 
 import scala.concurrent.Future
 
+import br.com.wallet.persistence.dao.BalanceDao._
+import br.com.wallet.persistence.dao.ItemDAO._
+
 /**
  * Created by sirkleber on 13/08/15.
  */
@@ -21,6 +24,8 @@ object AccountTypeDAO extends Dao {
     accName <- str("accname")
     description <- str("description")
     closingDay <- str("closingday")
-  } yield AccountType(accountTypeId, accName, description, closingDay, ItemDAO.getItemsByAccountType(accountTypeId), Nil)
+  } yield AccountType(
+      accountTypeId, accName, description, closingDay, getItemsByAccountType(accountTypeId), getLastBalanceByTypeId(accountTypeId)
+    )
   )("userid" -> userid)
 }
