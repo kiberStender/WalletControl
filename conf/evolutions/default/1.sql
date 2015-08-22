@@ -2,6 +2,12 @@
 
 # --- !Ups
 
+CREATE TABLE public.transactiontype (
+  transactiontypeid VARCHAR(40) NOT NULL,
+  transactiontypename VARCHAR(15) NOT NULL,
+  CONSTRAINT trtid PRIMARY KEY (transactiontypeid)
+);
+
 
 CREATE TABLE public.accuser (
   accuserid VARCHAR(40) NOT NULL,
@@ -33,12 +39,20 @@ CREATE TABLE public.balance (
 CREATE TABLE public.item (
   itemid VARCHAR(40) NOT NULL,
   acctype VARCHAR(40) NOT NULL,
+  trtype VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
+  itemvalue NUMERIC(6,2) NOT NULL,
   purchaseDate DATE NOT NULL,
-  trtype VARCHAR(3) NOT NULL,
-  CONSTRAINT itemid PRIMARY KEY (itemid, acctype)
+  CONSTRAINT itemid PRIMARY KEY (itemid, acctype, transactiontypeid)
 );
 
+
+ALTER TABLE public.item ADD CONSTRAINT transactiontype_item_fk
+FOREIGN KEY (transactiontypeid)
+REFERENCES public.transactiontype (transactiontypeid)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
 
 ALTER TABLE public.accounttype ADD CONSTRAINT accuser_accounttype_fk
 FOREIGN KEY (accuserid)
