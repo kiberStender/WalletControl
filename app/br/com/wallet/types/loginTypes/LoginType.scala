@@ -1,7 +1,9 @@
 package br.com.wallet.types.loginTypes
 
-import br.com.wallet.persistence.dao.{AccountTypeDAO, AccuserDAO}
-import br.com.wallet.persistence.dto.{AccountType, Accuser}
+import java.util.Date
+
+import br.com.wallet.persistence.dao.{BalanceDao, AccountTypeDAO, AccuserDAO}
+import br.com.wallet.persistence.dto.{Balance, AccountType, Accuser}
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.logonType.LogonData
 import br.com.wallet.types.token.OauthToken
@@ -68,9 +70,11 @@ abstract class LoginType {
         case (Some(userid), LogonData(_, username, usermail, pic)) => Future(LogonData(userid, username, usermail, pic))
         case (None, LogonData(_, username, usermail, pic)) => for {
           accuserid <- Future(Codecs.sha1(s"$usermail-${new DateTime()}"))
-          accounttypeid <- Future(Codecs.sha1(s"$usermail-${new DateTime()}"))
           _ <- AccuserDAO.insertAccuser(Accuser(accuserid, usermail))
+          accounttypeid <- Future(Codecs.sha1(s"$usermail-${new DateTime()}"))
           _ <- AccountTypeDAO.insert(AccountType(accounttypeid, "Wallet", "Carteira", "30", Nil, Nil))(accuserid)
+          balanceid <- Future(Codecs.sha1(s"$usermail-${new DateTime()}"))
+          _ <- BalanceDao.insertBalance(Balance(balanceid, 0.0, 0.0, new Date()), accounttypeid)
         } yield LogonData(accuserid, username, usermail, pic)
       }
 

@@ -1,5 +1,6 @@
 package br.com.wallet.persistence.dao
 
+import scala.concurrent.Future
 import br.com.wallet.persistence.dto.Balance
 import anorm.SqlParser._
 
@@ -15,4 +16,10 @@ object BalanceDao extends Dao {
     realbalance <- double("realbalance")
     balancedate <- date("balancedate")
   } yield Balance(balanceid, calcbalance, realbalance, balancedate))('typeid -> typeid)
+
+  def insertBalance: (Balance, String) => Future[Unit] = {
+    case (Balance(balanceid, calcbalance, realbalance, balancedate), typeid) => queryUpdate(
+      "Insert into balance(balanceid, typeid, calcbalance, realbalance, balancedate) values({balanceid}, {typeid}, {calcbalance}, {realbalance}, {balancedate})"
+    )('balanceid -> balanceid, 'typeid -> typeid, 'calcbalance -> calcbalance, 'realbalance -> realbalance, 'balancedate -> balancedate)
+  }
 }
