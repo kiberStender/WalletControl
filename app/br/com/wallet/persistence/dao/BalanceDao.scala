@@ -1,5 +1,7 @@
 package br.com.wallet.persistence.dao
 
+import play.api.Logger
+
 import scala.concurrent.Future
 import br.com.wallet.persistence.dto.Balance
 import anorm.SqlParser._
@@ -9,10 +11,10 @@ import anorm.SqlParser._
  */
 object BalanceDao extends Dao {
   def getLastBalanceByTypeId(typeid: String) = queryRunnerManyS(
-    "Select * from balance where typeid = {typeid} group by balancedate asc"
+    "Select * from balance where typeid = {typeid} order by balancedate asc"
   )(for {
     balanceid <- str("balanceid")
-    calcbalance <- double("")
+    calcbalance <- double("calcbalance")
     realbalance <- double("realbalance")
     balancedate <- date("balancedate")
   } yield Balance(balanceid, calcbalance, realbalance, balancedate))('typeid -> typeid)
