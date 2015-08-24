@@ -18,11 +18,11 @@ CREATE TABLE public.accuser (
 
 CREATE TABLE public.accounttype (
   acctypeid VARCHAR(40) NOT NULL,
-  accuserid VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
   closingday CHAR(2) NOT NULL,
   accname VARCHAR(25) NOT NULL,
-  CONSTRAINT accounttypeid PRIMARY KEY (acctypeid, accuserid)
+  accuserid VARCHAR(40) NOT NULL,
+  CONSTRAINT accounttypeid PRIMARY KEY (acctypeid)
 );
 
 
@@ -38,12 +38,12 @@ CREATE TABLE public.balance (
 
 CREATE TABLE public.item (
   itemid VARCHAR(40) NOT NULL,
-  acctype VARCHAR(40) NOT NULL,
-  trtype VARCHAR(40) NOT NULL,
+  acctypeid VARCHAR(40) NOT NULL,
+  transactiontypeid VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
   itemvalue NUMERIC(6,2) NOT NULL,
   purchaseDate DATE NOT NULL,
-  CONSTRAINT itemid PRIMARY KEY (itemid, acctype, transactiontypeid)
+  CONSTRAINT itemid PRIMARY KEY (itemid, acctypeid, transactiontypeid)
 );
 
 
@@ -61,15 +61,15 @@ ON DELETE NO ACTION
 ON UPDATE NO ACTION
 NOT DEFERRABLE;
 
-ALTER TABLE public.item ADD CONSTRAINT accounttype_item_fk
-FOREIGN KEY (acctype)
+ALTER TABLE public.balance ADD CONSTRAINT accounttype_balance_fk
+FOREIGN KEY (typeid)
 REFERENCES public.accounttype (acctypeid)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION
 NOT DEFERRABLE;
 
-ALTER TABLE public.balance ADD CONSTRAINT accounttype_balance_fk
-FOREIGN KEY (typeid)
+ALTER TABLE public.item ADD CONSTRAINT accounttype_item_fk
+FOREIGN KEY (acctypeid)
 REFERENCES public.accounttype (acctypeid)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION
