@@ -2,9 +2,6 @@ package br.com.wallet.persistence.dao
 
 import anorm.SqlParser._
 import br.com.wallet.persistence.dto.Item
-import play.api.Logger
-
-import scala.concurrent.Future
 
 /**
  * Created by sirkleber on 13/08/15.

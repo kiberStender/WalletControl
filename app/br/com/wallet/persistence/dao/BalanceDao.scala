@@ -1,7 +1,5 @@
 package br.com.wallet.persistence.dao
 
-import play.api.Logger
-
 import scala.concurrent.Future
 import br.com.wallet.persistence.dto.Balance
 import anorm.SqlParser._
