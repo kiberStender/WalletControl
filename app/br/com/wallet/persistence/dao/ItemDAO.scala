@@ -2,6 +2,7 @@ package br.com.wallet.persistence.dao
 
 import anorm.SqlParser._
 import br.com.wallet.persistence.dto.Item
+import play.api.Logger
 
 import scala.concurrent.Future
 
@@ -11,12 +12,14 @@ import scala.concurrent.Future
 object ItemDAO extends Dao {
 
   def getItemsByAccountType(acctypeId: String) = queryRunnerManyS(
-    "Select * from item where acctype = {acctypeid}"
+    """Select itemid, transactiontypename, description, itemvalue, purchasedate
+      From item i join transactiontype t on t.transactiontypeid = i.transactiontypeid
+      Where acctypeid = {acctypeid}"""
   )(for {
     itemId <- str("itemid")
     description <- str("description")
     value <- double("itemvalue")
     purchaseDate <- date("purchaseDate")
-    trtType <- str("trtype")
+    trtType <- str("transactiontypename")
   } yield Item(itemId, description, value, purchaseDate, trtType))("acctypeid" -> acctypeId)
 }
