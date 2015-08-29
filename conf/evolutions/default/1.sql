@@ -18,32 +18,34 @@ CREATE TABLE public.accuser (
 
 CREATE TABLE public.accounttype (
   acctypeid VARCHAR(40) NOT NULL,
+  accuserid VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
   closingday CHAR(2) NOT NULL,
   accname VARCHAR(25) NOT NULL,
-  accuserid VARCHAR(40) NOT NULL,
-  CONSTRAINT accounttypeid PRIMARY KEY (acctypeid)
+  CONSTRAINT accounttypeid PRIMARY KEY (acctypeid, accuserid)
 );
 
 
 CREATE TABLE public.balance (
   balanceid VARCHAR(40) NOT NULL,
-  typeid VARCHAR(40) NOT NULL,
+  acctypeid VARCHAR(40) NOT NULL,
+  accuserid VARCHAR(40) NOT NULL,
   calcbalance NUMERIC(6,2) NOT NULL,
   realbalance NUMERIC(6,2) NOT NULL,
   balancedate DATE NOT NULL,
-  CONSTRAINT balanceid PRIMARY KEY (balanceid, typeid)
+  CONSTRAINT balanceid PRIMARY KEY (balanceid, acctypeid, accuserid)
 );
 
 
 CREATE TABLE public.item (
   itemid VARCHAR(40) NOT NULL,
-  acctypeid VARCHAR(40) NOT NULL,
   transactiontypeid VARCHAR(40) NOT NULL,
+  acctypeid VARCHAR(40) NOT NULL,
+  accuserid VARCHAR(40) NOT NULL,
   description VARCHAR(70) NOT NULL,
   itemvalue NUMERIC(6,2) NOT NULL,
   purchaseDate DATE NOT NULL,
-  CONSTRAINT itemid PRIMARY KEY (itemid, acctypeid, transactiontypeid)
+  CONSTRAINT itemid PRIMARY KEY (itemid, transactiontypeid, acctypeid, accuserid)
 );
 
 
@@ -61,23 +63,23 @@ ON DELETE NO ACTION
 ON UPDATE NO ACTION
 NOT DEFERRABLE;
 
-ALTER TABLE public.balance ADD CONSTRAINT accounttype_balance_fk
-FOREIGN KEY (typeid)
-REFERENCES public.accounttype (acctypeid)
+ALTER TABLE public.item ADD CONSTRAINT accounttype_item_fk
+FOREIGN KEY (acctypeid, accuserid)
+REFERENCES public.accounttype (acctypeid, accuserid)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION
 NOT DEFERRABLE;
 
-ALTER TABLE public.item ADD CONSTRAINT accounttype_item_fk
-FOREIGN KEY (acctypeid)
-REFERENCES public.accounttype (acctypeid)
+ALTER TABLE public.balance ADD CONSTRAINT accounttype_balance_fk
+FOREIGN KEY (acctypeid, accuserid)
+REFERENCES public.accounttype (acctypeid, accuserid)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION
 NOT DEFERRABLE;
 
 # --- !Downs
 
-DROP TABLE balance;
 DROP TABLE item;
+DROP TABLE balance;
 DROP TABLE accounttype;
 DROP TABLE accuser;

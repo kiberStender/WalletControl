@@ -17,9 +17,13 @@ object BalanceDao extends Dao {
     balancedate <- date("balancedate")
   } yield Balance(balanceid, calcbalance, realbalance, balancedate))('typeid -> typeid, 'month -> actualMonth)
 
-  def insertBalance: (Balance, String) => Future[Unit] = {
-    case (Balance(balanceid, calcbalance, realbalance, balancedate), typeid) => queryUpdate(
-      "Insert into balance(balanceid, typeid, calcbalance, realbalance, balancedate) values({balanceid}, {typeid}, {calcbalance}, {realbalance}, {balancedate})"
-    )('balanceid -> balanceid, 'typeid -> typeid, 'calcbalance -> calcbalance, 'realbalance -> realbalance, 'balancedate -> balancedate)
+  def insertBalance: (Balance, String, String) => Future[Unit] = {
+    case (Balance(balanceid, calcbalance, realbalance, balancedate), typeid, userid) => queryUpdate(
+      """Insert into balance(balanceid, acctypeid, accuserid, calcbalance, realbalance, balancedate)
+        | values({balanceid}, {typeid}, {accuserid}, {calcbalance}, {realbalance}, {balancedate})""".stripMargin
+    )(
+      'balanceid -> balanceid, 'typeid -> typeid, 'calcbalance -> calcbalance, 'realbalance -> realbalance,
+      'balancedate -> balancedate, 'accuserid -> userid
+    )
   }
 }

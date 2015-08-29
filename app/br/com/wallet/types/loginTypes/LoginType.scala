@@ -74,7 +74,7 @@ abstract class LoginType {
           accounttypeid <- Future(Codecs.sha1(s"$usermail-${new DateTime()}"))
           _ <- AccountTypeDAO.insert(AccountType(accounttypeid, "Wallet", "Carteira", "30", Nil, Nil))(accuserid)
           balanceid <- Future(Codecs.sha1(s"$usermail-${new DateTime()}"))
-          _ <- BalanceDao.insertBalance(Balance(balanceid, 0.0, 0.0, new Date()), accounttypeid)
+          _ <- BalanceDao.insertBalance(Balance(balanceid, 0.0, 0.0, new Date()), accounttypeid, accuserid)
         } yield LogonData(accuserid, username, usermail, pic)
       }
 
