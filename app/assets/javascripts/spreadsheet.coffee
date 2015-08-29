@@ -1,5 +1,39 @@
 {IOPerformer: {main, consoleIO}, query, get, seq, arrayToSeq, webSocket} = fpJS
 
+formatDate = (dt) ->
+  formatDay = (day) -> if day > 9 then day else "0#{day}"
+  formatMonth = (month) -> if month > 9 then month else "0#{month}"
+  "#{formatDay dt.getDate()}-#{formatMonth dt.getMonth() + 1}-#{dt.getFullYear()}"
+
+formatHeader = (accname, saldo) -> """<tr>
+  <td>#{accname}</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td>#{saldo}</td>
+</tr>"""
+
+formatBody = (saldo, body) -> body.foldLeft([saldo, ""]) (acc) -> (item) ->
+  {itemId, description, purchaseDate, trtType, value} = item
+  [oSaldo, trs] = acc
+  nSaldo = if value > 0 then oSaldo + value else oSaldo - (value * -1)
+
+  inOrOut = -> if value > 0 then "<td>#{value}</td><td>0</td>" else "<td>0</td><td>#{value * -1}</td>"
+  drawSaldo = -> if nSaldo > 0 then "<td>#{nSaldo}</td>" else """<td class="negative">#{nSaldo}</td>"""
+
+  [nSaldo, """#{trs}<tr>
+    <td class="mdl-data-table__cell--non-numeric">#{formatDate new Date purchaseDate}</td>
+    <td>#{description}</td>
+    #{inOrOut()}
+    #{drawSaldo()}
+  </tr>"""]
+
+formatSpreadsheet = (arr) -> query("#spreadsheet tbody").writeHtml arrayToSeq(arr).foldLeft("") (act) -> (acc) ->
+  {description, balances: [balance], items} = acc
+  {realbalance} = balance
+  [_, body] = formatBody realbalance, arrayToSeq items
+  "#{act}#{formatHeader description, realbalance}#{body}"
+
 main -> consoleIO (
   get "/getData", true
     .then (json) ->
@@ -14,23 +48,8 @@ main -> consoleIO (
             query("#logedUsermail").writeHtml("Hello #{usermail}").then ->
               webSocket "ws://localhost:1234/spreadsheetWs/#{state}"
               .onOpen (evt, sender) -> sender.send new SpreadsheetRequestGet(accuserid).stringify()
-              .onClose (evt) -> evt
-              .whenMessageComes (msg, sender) ->
-                {response} = JSON.parse msg
-                tr = ((arrayToSeq response).flatMap (acc) -> (arrayToSeq acc.items).fmap (item) ->
-                  {itemId, description, purchaseDate, trtType} = item
-                  """
-                  <tr>
-                    <td class="mdl-data-table__cell--non-numeric">#{purchaseDate}</td>
-                    <td>#{description}</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>#{acc.description}</td>
-                  </tr>"""
-
-                ).foldLeft("") (acc) -> (item) -> acc + item
-                query("#spreadsheet tbody").writeHtml(tr)
+              .onClose (evt) -> alert "Closed connection"
+              .whenMessageComes (msg, sender) -> formatSpreadsheet (JSON.parse msg).response
 
     .catch alert
 )
