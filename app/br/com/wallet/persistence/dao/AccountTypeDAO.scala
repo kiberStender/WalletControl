@@ -3,6 +3,7 @@ package br.com.wallet.persistence.dao
 import br.com.wallet.persistence.dto.AccountType
 
 import anorm.SqlParser._
+import org.joda.time.DateTime
 
 import scala.concurrent.Future
 
@@ -24,8 +25,11 @@ object AccountTypeDAO extends Dao {
     accName <- str("accname")
     description <- str("description")
     closingDay <- str("closingday")
-  } yield AccountType(
-      accountTypeId, accName, description, closingDay, getItemsByAccountType(accountTypeId), getLastBalanceByTypeId(accountTypeId)
-    )
+  } yield {
+      def actualMonth = DateTime.now().monthOfYear().get()
+      AccountType(
+        accountTypeId, accName, description, closingDay, getItemsByAccountType(accountTypeId), getBalanceByTypeIdAndMonth(accountTypeId, actualMonth)
+      )
+    }
   )("userid" -> userid)
 }
