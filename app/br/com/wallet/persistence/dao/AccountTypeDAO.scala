@@ -28,7 +28,8 @@ object AccountTypeDAO extends Dao {
   } yield {
       def actualMonth = DateTime.now().monthOfYear().get()
       AccountType(
-        accountTypeId, accName, description, closingDay, getItemsByAccountType(accountTypeId), getBalanceByTypeIdAndMonth(accountTypeId, actualMonth)
+        accountTypeId, accName, description, closingDay,
+        getItemsByAccountType(accountTypeId, userid), getByTypeIdUserIdAndMonth(accountTypeId, userid, actualMonth)
       )
     }
   )("userid" -> userid)
