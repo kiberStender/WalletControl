@@ -16,7 +16,7 @@ formatHeader = (accname, saldo) -> """<tr>
 formatBody = (saldo, body) -> body.foldLeft([saldo, ""]) (acc) -> (item) ->
   {itemId, description, purchaseDate, trtType, value} = item
   [oSaldo, trs] = acc
-  nSaldo = if value > 0 then oSaldo + value else oSaldo - (value * -1)
+  nSaldo = oSaldo + value
 
   inOrOut = -> if value > 0 then "<td>#{value}</td><td>0</td>" else "<td>0</td><td>#{value * -1}</td>"
   drawSaldo = -> if nSaldo > 0 then "<td>#{nSaldo}</td>" else """<td class="negative">#{nSaldo}</td>"""
@@ -24,8 +24,7 @@ formatBody = (saldo, body) -> body.foldLeft([saldo, ""]) (acc) -> (item) ->
   [nSaldo, """#{trs}<tr>
     <td class="mdl-data-table__cell--non-numeric">#{formatDate new Date purchaseDate}</td>
     <td>#{description}</td>
-    #{inOrOut()}
-    #{drawSaldo()}
+    #{inOrOut()}#{drawSaldo()}
   </tr>"""]
 
 formatSpreadsheet = (arr) -> query("#spreadsheet tbody").writeHtml arrayToSeq(arr).foldLeft("") (act) -> (acc) ->
