@@ -10,28 +10,33 @@ formatHeader = (accname, saldo) -> """<tr>
   <td></td>
   <td></td>
   <td></td>
-  <td>#{saldo}</td>
+  <td>R$ #{parseFloat(saldo).toFixed 2}</td>
 </tr>"""
 
-formatBody = (saldo, body) -> body.foldLeft([saldo, ""]) (acc) -> (item) ->
+formatBody = (saldo, body) -> body.foldLeft([totalEmpty(saldo), ""]) (acc) -> (item) ->
   {itemId, description, purchaseDate, trtType, value} = item
-  [oSaldo, trs] = acc
-  nSaldo = oSaldo + value
+  [oTotal, trs] = acc
+  {entrada, saida, saldoTotal} = oTotal
+  nSaldo = saldoTotal + value
+  [ent, sai] = if value > 0 then [value, 0.00] else [0.00, value]
+  total = new Total(entrada + ent, saida + sai, nSaldo)
 
-  inOrOut = -> if value > 0 then "<td>#{value}</td><td>0</td>" else "<td>0</td><td>#{value * -1}</td>"
-  drawSaldo = -> if nSaldo > 0 then "<td>#{nSaldo}</td>" else """<td class="negative">#{nSaldo}</td>"""
+  drawSaldo = (saldo) -> if saldo > 0 then "<td>R$ #{parseFloat(saldo).toFixed 2}</td>"
+  else """<td class="negative">R$ #{parseFloat(saldo).toFixed 2}</td>"""
 
-  [nSaldo, """#{trs}<tr>
+  [total, """#{trs}<tr>
     <td class="mdl-data-table__cell--non-numeric">#{formatDate new Date purchaseDate}</td>
     <td>#{description}</td>
-    #{inOrOut()}#{drawSaldo()}
+    <td>R$ #{parseFloat(ent).toFixed 2}</td>
+    <td>R$ #{parseFloat(sai).toFixed 2}</td>
+    #{drawSaldo nSaldo}
   </tr>"""]
 
 formatSpreadsheet = (arr) -> query("#spreadsheet tbody").writeHtml arrayToSeq(arr).foldLeft("") (act) -> (acc) ->
   {description, balances: [balance], items} = acc
   {realbalance} = balance
-  [_, body] = formatBody realbalance, arrayToSeq items
-  "#{act}#{formatHeader description, realbalance}#{body}"
+  [foot, body] = formatBody realbalance, arrayToSeq items
+  "#{act}#{formatHeader description, realbalance}#{body}#{foot.toString()}"
 
 main -> consoleIO (
   get "/getData", true
