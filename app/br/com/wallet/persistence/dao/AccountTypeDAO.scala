@@ -26,10 +26,11 @@ object AccountTypeDAO extends Dao {
     description <- str("description")
     closingDay <- str("closingday")
   } yield {
-      def actualMonth = DateTime.now().monthOfYear().get()
+      lazy val actualMonth = DateTime.now().monthOfYear().get()
       AccountType(
         accountTypeId, accName, description, closingDay,
-        getItemsByAccountType(accountTypeId, userid), getByTypeIdUserIdAndMonth(accountTypeId, userid, actualMonth)
+        getMonthItemsByAccountType(accountTypeId, userid, actualMonth),
+        getByTypeIdUserIdAndMonth(accountTypeId, userid, actualMonth)
       )
     }
   )("userid" -> userid)
