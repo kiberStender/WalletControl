@@ -2,8 +2,8 @@
 
 capitalize = (str) -> str.charAt(0).toUpperCase() + (str.slice 1).toLowerCase()
 
-Rx.Observable.fromEvent(document, 'DOMContentLoaded')
-  .flatMap Rx.Observable.fromPromise $.ajax({url: "/auth", method: "GET"}).promise()
+Rx.DOM.ready()
+  .flatMap -> Rx.DOM.getJSON '/auth'
   .subscribe ({failed, result, description}) -> if failed then window.location = "/spreadsheet"
   else document.querySelector(".jumbotron").innerHTML = (arrayToSeq result
     .fmap ({provider, authUri}) -> """<p>
