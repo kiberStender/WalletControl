@@ -3,9 +3,8 @@
 # ~~~~
 
 # Back end
-GET     /auth                       br.com.wallet.controllers.BackEndController.auth
-GET     /_oauth_callback/:provider  br.com.wallet.controllers.BackEndController.login(provider: String, code: Option[String], state: Option[String])
-GET     /spreadsheetWs/:state       br.com.wallet.controllers.BackEndController.spreadsheetWs(state: String)
+GET     /auth                                   br.com.wallet.controllers.BackEndController.auth
+GET     /_oauth_callback/:provider              br.com.wallet.controllers.BackEndController.login(provider: String, code: Option[String], state: Option[String])
 GET     /spreadsheet/:state/:accuserid          br.com.wallet.controllers.BackEndController.getSpreadsheetData(state: String, accuserid: String)
 
 # Graphical user interface
