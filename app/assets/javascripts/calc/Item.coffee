@@ -19,5 +19,8 @@ class Item then constructor: (itemId, description, value, purchaseDate, trtType)
       #{drawSaldo saldo + value}
     </tr>"""
 
+item = ({itemId, description, purchaseDate, trtType, value}) -> new Item itemId, description, value, purchaseDate, trtType
+
 root = exports ? window
 root.Item = Item
+root.Item.item = item
