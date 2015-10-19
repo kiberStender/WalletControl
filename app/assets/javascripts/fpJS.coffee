@@ -286,13 +286,17 @@ fpJS = do ->
   Number::until = (end) -> new Range (@ + 0), (end - 1)
     
   class Either extends Any 
-    fold: (rfn, lfn) -> if @ instanceof Right then rfn @value() else lfn @value()
+    fold: (rfn, lfn) -> if @isRight() then rfn @value() else lfn @value()
 
   class Right extends Either then constructor: (value) ->
+    @isRight = -> true
+    @isLeft = -> false
     @value = -> value
     @toString = -> "Right(#{value})"
 
   class Left extends Either then constructor: (value) ->
+    @isRight = -> false
+    @isLeft = -> true
     @value = -> value
     toString: -> "Left(#{value})"
     
