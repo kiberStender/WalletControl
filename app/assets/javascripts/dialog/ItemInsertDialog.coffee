@@ -53,7 +53,7 @@ do (InsertDialog, Item, {right, left} = fpJS) ->
       validateItem [desc(), itemType(), value(), purchaseDate()]
 
     callback = -> do (item = formToItem()) -> if item.isRight()
-      Rx.DOM.post "/spreadsheet/#{state}/#{accuserid}", item.value()
+      Rx.DOM.post "/spreadsheet/#{state}/#{accuserid}", JSON.stringify item.value()
         .subscribe ({failed, description, result}) -> alert if failed then description else "Item inserido"
     else alert item.value()
 
