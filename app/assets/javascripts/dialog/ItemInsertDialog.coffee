@@ -1,4 +1,4 @@
-do (InsertDialog, Item, {right, left} = fpJS) ->
+do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
   class ItemInsertDialog extends InsertDialog then constructor: ([state, accuserid]) ->
     form = -> """<div>
       <form id="itemForm">
@@ -53,8 +53,10 @@ do (InsertDialog, Item, {right, left} = fpJS) ->
       validateItem [desc(), itemType(), value(), purchaseDate()]
 
     callback = -> do (item = formToItem()) -> if item.isRight()
-      Rx.DOM.post "/spreadsheet/#{state}/#{accuserid}", JSON.stringify item.value()
-        .subscribe ({failed, description, result}) -> alert if failed then description else "Item inserido"
+      Rx.Observable.defer(-> $.ajax({
+        url: "/spreadsheet/#{state}/#{accuserid}"
+        type: "POST", data: JSON.stringify(item.value()), contentType: "application/json;charset=utf-8"
+      })).subscribe ({failed, description, result}) -> alert if failed then description else "Item inserido"
     else alert item.value()
 
     super form, callback, "Novo Item"
