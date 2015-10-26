@@ -1,5 +1,4 @@
-class Item then constructor: (@itemId, @description, @value, purchaseDate, @trtType) ->
-  @purchaseDate = formatDate purchaseDate
+class Item then constructor: (@itemId, @description, @value, @purchaseDate, @trtType) ->
   formatDate = (dt) ->
       formatDay = (day) -> if day > 9 then day else "0#{day}"
       formatMonth = (month) -> if month > 9 then month else "0#{month}"
