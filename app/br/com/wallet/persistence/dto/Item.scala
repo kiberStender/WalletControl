@@ -12,6 +12,8 @@ case class Item(
 ) extends Dto {
   override def toString =
     s"{itemId: $itemId, description: $description, value: $value, purchaseDate: $purchaseDate, trtType: $trtType}"
+
+  def withItemId(itemId_ : String): Item = Item(itemId_, description, value, purchaseDate, trtType)
 }
 
 object Item {
