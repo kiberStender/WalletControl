@@ -1,5 +1,8 @@
 package br.com.wallet.persistence.dao
 
+import org.joda.time.DateTime
+import play.api.libs.Codecs
+
 import scala.concurrent.Future
 import br.com.wallet.persistence.dto.Balance
 import anorm.SqlParser._
@@ -27,5 +30,32 @@ object BalanceDao extends Dao {
       'balanceid -> balanceid, 'typeid -> typeid, 'calcbalance -> calcbalance, 'realbalance -> realbalance,
       'balancedate -> balancedate, 'accuserid -> userid
     )
+  }
+
+  def updateBalance: (Balance, Boolean) => Future[Unit] = {
+    case (Balance(balanceid, calcbalance, _, _), true) => queryUpdate(
+      """Update balance set calcbalance = {calcbalance} where balanceid = {balanceid}"""
+    )('calcbalance -> calcbalance, 'balanceid -> balanceid)
+    case (Balance(balanceid, _, realbalance, _), false) => queryUpdate(
+      """Update balance set realbalance = {realbalance} where balanceid = {balanceid}"""
+    )('realbalance -> realbalance, 'balanceid -> balanceid)
+  }
+
+  def updateOrInsert: (Double, String, String, String) => Future[Unit] = {
+    case (realbalance, usermail, typeid, userid) =>
+      lazy val date = DateTime.now().toDate
+      def balances = queryRunnerManyS(
+        "Select balanceid, realbalance from balance where balancedate = {date}"
+      )(for {
+        id <- str("balanceid")
+        balance <- double("realbalance")
+      } yield (id, balance))('date -> date)
+
+      balances match {
+        case List((id, balance)) => updateBalance(Balance(id, 0.0, balance + realbalance, date), false)
+        case _ =>
+          def balanceid = Codecs.sha1(s"$usermail-${new DateTime()}")
+          insertBalance(Balance(balanceid, 0.0, realbalance, date), typeid, userid)
+      }
   }
 }
