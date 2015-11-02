@@ -80,15 +80,12 @@ class BackEndController extends ActionController {
     case (OAuthUser(_, _, LogonData(_, _, mail, _), _, _), req) =>
       lazy val action = for {
         itemJs <- req.body.asJson
-      } yield {
-          println(itemJs)
-          for {
-            item <- itemJs.validate[Item]
-          } yield for {
+      } yield for {
+          item <- itemJs.validate[Item]
+        } yield for {
             itemId <- Future(Codecs.sha1(s"$userid-${DateTime.now().toDate}-item"))
             _ <- ItemDAO insertItem(acctypeid, userid, item.withItemId(itemId))
           } yield (Success("Ok"), item.value)
-        }
 
       action match {
         case Some(vl) => vl.asOpt match {
