@@ -43,19 +43,14 @@ object BalanceDao extends Dao {
 
   def updateOrInsert: (Double, String, String, String) => Future[Unit] = {
     case (realbalance, usermail, typeid, userid) =>
-      lazy val date = DateTime.now().toDate
-      def balances = queryRunnerManyS(
-        "Select balanceid, realbalance from balance where balancedate = {date}"
-      )(for {
-        id <- str("balanceid")
-        balance <- double("realbalance")
-      } yield (id, balance))('date -> date)
+      lazy val date = DateTime.now().plusMonths(1)
+      def balances = getByTypeIdUserIdAndMonth(typeid, userid, date.getMonthOfYear)
 
-      balances match {
-        case List((id, balance)) => updateBalance(Balance(id, 0.0, balance + realbalance, date), false)
-        case _ =>
-          def balanceid = Codecs.sha1(s"$usermail-${new DateTime()}")
-          insertBalance(Balance(balanceid, 0.0, realbalance, date), typeid, userid)
+      (date.toDate, balances) match {
+        case (dt, List(Balance(id, _, balance, _))) => updateBalance(Balance(id, 0.0, balance + realbalance, dt), false)
+        case (dt, _) =>
+          def balanceid = Codecs.sha1(s"$usermail-${dt}")
+          insertBalance(Balance(balanceid, 0.0, realbalance, dt), typeid, userid)
       }
   }
 }
