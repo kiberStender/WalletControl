@@ -9,7 +9,7 @@ case class AccountType(
   accountTypeId: String, accName: String, description: String, closingDay: String, items: Seq[Item], balances: Seq[Balance]
 ) {
   override def toString = {
-    s"{accountTypeId: $accountTypeId, description: $description, accName: $accName, closingDay: $closingDay, items: $items, balance: $balances}"
+    s"{accountTypeId: $accountTypeId, description: $description, accName: $accName, closingDay: $closingDay, items: $items, balances: $balances}"
   }
 }
 
