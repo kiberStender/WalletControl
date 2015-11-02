@@ -21,14 +21,14 @@ trait ActionController extends Controller {
   protected def oauthStateSesion = "oauth_state"
 
   protected def validateSession: (String, String) => ((OAuthUser, Request[AnyContent]) => Future[Result]) => Action[AnyContent] = {
-    case (state, userid) => f => Action.async {req =>
+    case (state, userid) => f => Action.async { req =>
       req.session.get(oauthUserSession) match {
         case Some(userJson) => (for {
           user <- Json.parse(userJson).validate[OAuthUser]
-        } yield if(user.state == state){
-            f(user, req)
-          } else {
-            Future(Ok(Failure("Sessão expirou") toJson) as jsonApp)
+        } yield (user.state == state, user.logonData.accuserid == userid) match {
+            case (true, true) => f(user, req)
+            case (false, _) => Future(Ok(Failure("Sessão expirou") toJson) as jsonApp)
+            case (_, false) => Future(Ok(Failure("Usuário não logado nesta máquina") toJson) as jsonApp)
           }).getOrElse(Future(Ok(Failure("Erro ao processar dados do usuário") toJson) as jsonApp))
         case None => Future{Ok(Failure("Sessão expirou") toJson) as jsonApp}
       }
