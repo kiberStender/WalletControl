@@ -8,9 +8,9 @@ do ({DOM, Observable: {fromPromise, fromEvent}} = Rx, {arrayToSeq} = fpJS, bootb
   </tr>"""
 
   formatBody = ([saldo, body]) -> body.foldLeft([totalEmpty(saldo), ""]) ([{entrada, saida, saldoTotal}, trs]) -> (item) ->
-    nSaldo = saldoTotal + value
-    total = -> new Total(entrada + ent, saida + sai, nSaldo)
-    [total(), "#{trs}#{item.draw nSaldo}"]
+    [ent, sai] = if item.value > 0 then [item.value, 0.00] else [0.00, item.value]
+    total = -> new Total(entrada + ent, saida + sai, saldoTotal + item.value)
+    [total(), "#{trs}#{item.draw saldoTotal}"]
 
   formatSpreadsheet = (arr) -> arrayToSeq(arr).foldLeft("") (act) -> ({description, balances: [{realbalance}], items}) ->
     [foot, body] = formatBody [realbalance, arrayToSeq(items).fmap Item.item]
