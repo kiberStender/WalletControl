@@ -8,7 +8,9 @@ import br.com.wallet.persistence.dao.{BalanceDao, ItemDAO, AccountTypeDAO}
 import br.com.wallet.persistence.dto.Item
 import br.com.wallet.types.loginOption.LoginOption
 import br.com.wallet.types.loginTypes.{GithubType, LoginType, GoogleType}
+import br.com.wallet.types.logonType.LogonData
 import br.com.wallet.types.oauthUser.OAuthUser
+import org.joda.time.DateTime
 import play.api.libs.Codecs
 import play.api.libs.json.Json
 import play.api.{Configuration, Play}
@@ -52,20 +54,19 @@ class BackEndController extends ActionController {
       code <- codeOpt
       state <- stateOpt
       oauthState <- req.session.get(oauthStateSesion)
-    } yield if (state == oauthState) {
-        for {
+    } yield state == oauthState match {
+        case true => for {
           fToken <- loginType.getToken(code, routes.BackEndController.login(loginType.provider, None, None).absoluteURL())
         } yield (for {
-          (token, user) <- fToken
-        } yield {
-            def json = Json.toJson(OAuthUser(state, code, user, token, loginType))
-            Redirect("/spreadsheet").withSession(oauthUserSession -> json.toString)
-          }
-          ).getOrElse(BadRequest("Provedor não autorizou"))
-      } else {
-        Future.successful(BadRequest("Você não está logado"))
+            (token, user) <- fToken
+          } yield {
+              def json = Json.toJson(OAuthUser(state, code, user, token, loginType))
+              Redirect("/spreadsheet").withSession(oauthUserSession -> json.toString)
+            }
+          ) getOrElse(BadRequest("Provedor não autorizou"))
+        case false => Future.successful(BadRequest("Você não está logado"))
       }
-      ) getOrElse Future.successful(BadRequest("Servidor não proveu os valores"))
+    ) getOrElse Future.successful(BadRequest("Servidor não proveu os valores"))
   }
 
   def getSpreadsheetData(state: String, userid: String) = validateSession(state, userid) { (_, _) => for {
@@ -75,25 +76,29 @@ class BackEndController extends ActionController {
 
   private def acctypeid = "5cfb525a5c5a5dd29beb6f257b6a7f22d157c630"
 
-  def insertItem(state: String, userid: String) = validateSession(state, userid) { (user, req) =>
-    lazy val action = for {
-      itemJs <- req.body.asJson
-    } yield for {
-        item <- itemJs.validate[Item]
-      } yield for {
-          itemId <- Future(Codecs.sha1(s"$userid-${item.purchaseDate}-item"))
-          _ <- ItemDAO insertItem(acctypeid, userid, item.withItemId(itemId))
-        } yield (Success("Ok"), item.value)
+  def insertItem(state: String, userid: String) = validateSession(state, userid) {
+    case (OAuthUser(_, _, LogonData(_, _, mail, _), _, _), req) =>
+      lazy val action = for {
+        itemJs <- req.body.asJson
+      } yield {
+          println(itemJs)
+          for {
+            item <- itemJs.validate[Item]
+          } yield for {
+            itemId <- Future(Codecs.sha1(s"$userid-${DateTime.now().toDate}-item"))
+            _ <- ItemDAO insertItem(acctypeid, userid, item.withItemId(itemId))
+          } yield (Success("Ok"), item.value)
+        }
 
-    action match {
-      case Some(vl) => vl.asOpt match {
-        case Some(ft) => for {
-          (result, balance) <- ft
-          _ <- BalanceDao.updateOrInsert(balance, user.logonData.usermail, acctypeid, userid)
-        } yield Ok(result toJson) as jsonApp
-        case None => Future(Ok(Failure("Problema ao inserir novo item") toJson) as jsonApp)
+      action match {
+        case Some(vl) => vl.asOpt match {
+          case Some(ft) => for {
+            (result, balance) <- ft
+            _ <- BalanceDao.updateOrInsert(balance, mail, acctypeid, userid)
+          } yield Ok(result toJson) as jsonApp
+          case None => Future(Ok(Failure("Problema ao inserir novo item") toJson) as jsonApp)
+        }
+        case None => Future(Ok(Failure("Json Inválido").toJson) as jsonApp)
       }
-      case None => Future(Ok(Failure("Json Inválido").toJson) as jsonApp)
-    }
   }
 }
