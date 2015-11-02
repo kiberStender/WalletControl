@@ -40,14 +40,14 @@ do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
     </div>"""
 
     validateItem = ([desc, type, value, purchaseDt]) -> if desc is "" then left "Descrição não pode ser vazia"
-    else if (parseFloat value) <= 0 then left "Valor não pode ser 0 ou menor"
+    else if value <= 0 then left "Valor não pode ser 0 ou menor"
     else if (new Date purchaseDt).toString() is "Invalid Date" then left "Data inválida"
     else right new Item "", desc, (if type is "in" then value else -value), purchaseDate.value, "id00"
 
     formToItem = ->
       desc = -> document.querySelector("#desc").value
       itemType = -> document.querySelector("#itemType").value
-      value = -> document.querySelector("#value").value
+      value = -> parseFloat document.querySelector("#value").value
       purchaseDate = -> document.querySelector("#purchaseDate").value
 
       validateItem [desc(), itemType(), value(), purchaseDate()]
