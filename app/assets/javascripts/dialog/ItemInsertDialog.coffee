@@ -6,7 +6,7 @@ do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
            <div class="col-xs-4">
              <div class="input-group">
                <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
-               <input id="desc" type="text" class="form-control" placeholder="Descrição">
+               <input id="desc" type="text" class="form-control" autofocus placeholder="Descrição">
              </div>
            </div>
 
