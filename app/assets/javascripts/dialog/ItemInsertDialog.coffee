@@ -57,7 +57,10 @@ do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
         url: "/spreadsheet/#{state}/#{accuserid}"
         type: "POST", data: JSON.stringify(item.value()), contentType: "application/json;charset=utf-8"
       })).subscribe ({failed, description, result}) -> alert if failed then description else "Item inserido"
-    else alert item.value()
+      true
+    else
+      alert item.value()
+      false
 
     super form, callback, "Novo Item"
 
