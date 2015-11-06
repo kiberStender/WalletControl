@@ -1,21 +1,20 @@
 do ({DOM, Observable: {fromPromise, fromEvent}} = Rx, {arrayToSeq} = fpJS, {spreadsheet} = Spreadsheet) ->
+  whenNotFail = ({failed, description, result}) -> (fn) -> if failed then {failed, description} else fn result
+  loadData = (spread) -> DOM.getJSON("/getData").map (json) -> whenNotFail(json) ({logonData: {accuserid, username, usermail, profilePicture}, state}) ->
+    document.querySelector("#logedUserProfile").src = profilePicture
+    document.querySelector("#logedUsername").innerHTML = "Hello #{username}"
+    document.querySelector("#logedUsermail").innerHTML = usermail
+
+    {result: [spread, accuserid, state]}
+
+  loadItems = (obj) -> whenNotFail(obj) ([spread, accuserid, state]) ->
+    DOM.getJSON("/spreadsheet/#{state}/#{accuserid}").map (json) -> whenNotFail(json) (result) -> {result: [spread, accuserid, state, result]}
+
   applyNewButton = (dt) -> fromEvent((document.getElementById "newItem"), "click").subscribe -> new ItemInsertDialog(dt).draw()
+
+  addActionToButton = (obj) -> whenNotFail(obj) ([spread, accuserid, state, result]) -> applyNewButton.andThen(-> {result: [spread, accuserid, state, result]}) [accuserid, state]
 
   DOM.ready()
     .map -> spreadsheet("#spreadsheetdiv").render()
-    .flatMap((spread) -> DOM.getJSON("/getData").map ({failed, description, result}) ->
-      if failed then {failed, description}
-      else
-        {logonData: {accuserid, username, usermail, profilePicture}, state} = result
-
-        document.querySelector("#logedUserProfile").src = profilePicture
-        document.querySelector("#logedUsername").innerHTML = "Hello #{username}"
-        document.querySelector("#logedUsermail").innerHTML = usermail
-
-        {result: [spread, accuserid, state]}
-    ).flatMap(({failed, description, result: [spread, accuserid, state]}) ->
-      if failed then {failed, description}
-      else DOM.getJSON("/spreadsheet/#{state}/#{accuserid}").map ({failed, description, result}) -> if failed then {failed, description}
-      else {result: [spread, accuserid, state, result]}
-    ).map ({failed, description, result: [spread, accuserid, state, result]}) -> applyNewButton.andThen(-> {failed, description, result: [spread, accuserid, state, result]}) [accuserid, state]
+    .flatMap(loadData).flatMap(loadItems).map addActionToButton
     .subscribe ({failed, description, result: [spread, accuserid, state, result]}) -> if failed then alert description else spread.withItems(arrayToSeq(result)).render()
