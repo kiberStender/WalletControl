@@ -1,7 +1,11 @@
 do ({Ordering} = fpJS.withFnExtension()) ->
   class Item extends Ordering then constructor: (@itemId, @description, @value, @purchaseDate, @trtType) ->
+    @toString = -> JSON.stringify @
     toDate = (str) -> new Date(str)
-    @compare = ({purchaseDate}) -> toDate(@purchaseDate).getTime().compare(toDate(purchaseDate).getTime())
+    @compare = (item) ->
+      this_dt = toDate(purchaseDate).getTime()
+      that_dt = toDate(item.purchaseDate).getTime()
+      if this_dt is that_dt then 0 else (if this_dt < that_dt then -1 else 1)
 
     formatDate = (dt) ->
         formatDay = (day) -> if day > 9 then day else "0#{day}"

@@ -1,5 +1,5 @@
-do ({seq, arrayToSeq} = fpJS) ->
-  class Spreadsheet then constructor: (el, placed, rows = seq()) ->
+do ({set, arrayToSeq} = fpJS.withFnExtension()) ->
+  class Spreadsheet then constructor: (el, placed, rows = set()) ->
     base = -> """<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp full-width" id="spreadsheet">
                       <thead>
                         <tr>
@@ -21,25 +21,8 @@ do ({seq, arrayToSeq} = fpJS) ->
                       </tfoot>
                     </table>"""
 
-    formatHeader = ([accname, saldo]) -> """<tr>
-        <td>#{accname}</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>R$ #{parseFloat(saldo).toFixed 2}</td>
-      </tr>"""
-
-    formatBody = ([saldo, body]) -> body.foldLeft([totalEmpty(saldo), ""]) ([{entrada, saida, saldoTotal}, trs]) -> (item) ->
-        [ent, sai] = if item.value > 0 then [item.value, 0.00] else [0.00, item.value]
-        total = -> new Total(entrada + ent, saida + sai, saldoTotal + item.value)
-        [total(), "#{trs}#{item.draw saldoTotal}"]
-
-    formatSpreadsheet = (arr) -> arr.foldLeft("") (act) -> ({description, balances: [{realbalance}], items}) ->
-        [foot, body] = formatBody [realbalance, arrayToSeq(items).fmap Item.item]
-        "#{act}#{formatHeader [description, realbalance]}#{body}#{foot}"
-
     renderNotPlaced = -> document.querySelector(el).innerHTML = base()
-    renderPlaced = -> document.querySelector("#spreadsheet tbody").innerHTML = formatSpreadsheet rows
+    renderPlaced = -> document.querySelector("#spreadsheet tbody").innerHTML = rows.foldLeft("") (acc) -> (acctype) -> acc + acctype.draw()
 
     render_ = -> if placed then renderPlaced() else renderNotPlaced()
 
