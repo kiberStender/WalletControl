@@ -1,5 +1,5 @@
 do ({set, arrayToSeq} = fpJS.withFnExtension()) ->
-  class Spreadsheet then constructor: (el, placed, rows = set()) ->
+  class Spreadsheet then constructor: (el, placed, accTypes = set()) ->
     base = -> """<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp full-width" id="spreadsheet">
                       <thead>
                         <tr>
@@ -22,13 +22,14 @@ do ({set, arrayToSeq} = fpJS.withFnExtension()) ->
                     </table>"""
 
     renderNotPlaced = -> document.querySelector(el).innerHTML = base()
-    renderPlaced = -> document.querySelector("#spreadsheet tbody").innerHTML = rows.foldLeft("") (acc) -> (acctype) -> acc + acctype.draw()
+    renderPlaced = ->
+      document.querySelector("#spreadsheet tbody").innerHTML = accTypes.foldLeft("") (acc) -> (acctype) -> acc + acctype.draw()
 
     render_ = -> if placed then renderPlaced() else renderNotPlaced()
 
-    @render = -> render_.andThen(-> new Spreadsheet el, true, rows)()
+    @render = -> render_.andThen(-> new Spreadsheet el, true, accTypes)()
 
-    @withItems = (nRows) -> new Spreadsheet(el, placed, rows.concat nRows)
+    @withItems = (nAccTypes) -> new Spreadsheet(el, placed, accTypes.concat nAccTypes)
 
   root = exports ? window
   root.Spreadsheet = Spreadsheet

@@ -24,7 +24,6 @@ do ({Ordering, arrayToSeq, set} = fpJS.withFnExtension(), Item) ->
          </tr>"""
 
     body = -> items.foldLeft([[0, 0, realbalance], ""]) ([[entrada, saida, saldoTotal], trs]) -> (item) ->
-      alert entrada
       [ent, sai] = if item.value > 0 then [item.value, 0.00] else [0.00, item.value]
       total =  [entrada + ent, saida + sai, saldoTotal + item.value]
       [total, "#{trs}#{item.draw saldoTotal}"]
@@ -35,7 +34,6 @@ do ({Ordering, arrayToSeq, set} = fpJS.withFnExtension(), Item) ->
 
   accountType = ({accountTypeId, accName, description, closingDay, items, balances}) ->
     items_ = arrayToSeq(items).fmap(Item.item)
-    alert items_
     new AccountType accountTypeId, accName, description, closingDay, items_, balances
 
   root = exports ? window
