@@ -31,6 +31,8 @@ do ({set, arrayToSeq} = fpJS.withFnExtension()) ->
 
     @withItems = (nAccTypes) -> new Spreadsheet(el, placed, accTypes.concat nAccTypes)
 
+    @toString = -> accTypes.toString()
+
   root = exports ? window
   root.Spreadsheet = Spreadsheet
   root.Spreadsheet.spreadsheet = (el) -> new Spreadsheet(el, false)
