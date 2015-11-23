@@ -64,5 +64,8 @@ do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
 
     super form, callback, "Novo Item"
 
+  itemInsertDialog = (tp) -> new ItemInsertDialog tp
+
   root = exports ? window
   root.ItemInsertDialog = ItemInsertDialog
+  root.ItemInsertDialog.itemInsertDialog = itemInsertDialog
