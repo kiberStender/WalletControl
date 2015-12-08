@@ -22,7 +22,7 @@
           <i class="material-icons">more_vert</i>
         </button>
         <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-          <li class="mdl-menu__item" id="newItem">Novo item</li>
+          <li class="mdl-menu__item" id="newItem" name="">Novo item</li>
         </ul>
       </div>
     </header>
@@ -57,6 +57,61 @@
     <main class="mdl-layout__content mdl-color--grey-100">
       <div id="spreadsheetdiv"></div>
     </main>
+  </div>
+
+  <div id="insertModal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="closeBtn" type="button" class="close" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Confirmation</h4>
+        </div>
+        <div class="modal-body">
+          <form id="itemForm">
+
+            <div class="row">
+              <div class="col-xs-4">
+                <div class="input-group">
+                  <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+                  <input id="desc" type="text" class="form-control" autofocus placeholder="Descrição">
+                </div>
+              </div>
+
+              <div class="col-xs-4 selectContainer">
+                <select class="form-control" name="size" id="itemType">
+                  <option value="out">Saída</option>
+                  <option value="in">Entrada</option>
+                </select>
+              </div>
+
+              <div class="col-xs-4">
+                <div class="input-group">
+                  <span class="input-group-addon">R$</span>
+                  <input id="value" type="text" class="form-control" placeholder="Valor">
+                  <span class="input-group-addon">.00</span>
+                </div>
+              </div>
+            </div>
+
+            <br/>
+
+            <div class="row">
+              <div class="col-xs-4">
+                <div class="input-group">
+                  <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                  <input id="purchaseDate" type="date" class="form-control">
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button id="notInsertItem" type="button" class="btn btn-default">Close</button>
+          <button id="insertItem" type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
