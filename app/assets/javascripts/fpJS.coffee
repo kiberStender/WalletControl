@@ -558,7 +558,7 @@ fpJS = do ->
     #Set
     set, arrayToSet
     #utils.either
-    right, left
+    Either, Left, Right, right, left
     #utils.try_
     _try, success, failure
     #IO
