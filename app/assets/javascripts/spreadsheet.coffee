@@ -1,22 +1,45 @@
-do ({DOM, Observable: {fromPromise, fromEvent}} = Rx, {arrayToSeq} = fpJS.withFnExtension(), {spreadsheet} = Spreadsheet) ->
+do (
+  {DOM, Observable: {fromPromise, fromEvent}} = Rx, {arrayToSeq, set, Either} = fpJS.withFnExtension(),
+  {spreadsheet} = Spreadsheet, {itemInsertDialog} = ItemInsertDialog
+) ->
   whenNotFail = (fn) -> ({failed, description, result}) -> if failed then {failed, description} else fn result
+
+  logoutButton = fromEvent((document.querySelector "#logoutItem"), "click").map -> location.href = "/logout"
+
+  newItemButton = document.querySelector "#newItem"
+
   loadData = (spread) -> DOM.getJSON("/getData").map whenNotFail ({logonData: {accuserid, username, usermail, profilePicture}, state}) ->
-    document.querySelector("#logedUserProfile").src = profilePicture
-    document.querySelector("#logedUsername").innerHTML = "Hello #{username}"
-    document.querySelector("#logedUsermail").innerHTML = usermail
+      document.querySelector("#logedUserProfile").src = profilePicture
+      document.querySelector("#logedUsername").innerHTML = "Hello #{username}"
+      document.querySelector("#logedUsermail").innerHTML = usermail
+      newItemButton.name = "#{accuserid}_#{state}"
 
-    {result: [spread, accuserid, state]}
+      {result: [spread, accuserid, state]}
 
-  loadItems = whenNotFail ([spread, accuserid, state]) -> DOM.getJSON("/spreadsheet/#{state}/#{accuserid}").map whenNotFail (result) -> {result: [spread, accuserid, state, result]}
+  loadItems = whenNotFail ([spread, accuserid, state]) ->
+    DOM.getJSON("/spreadsheet/#{state}/#{accuserid}").map whenNotFail (result) ->
+      {result: [spread, accuserid, state, result]}
 
-  newButton = (dt) -> fromEvent((document.getElementById "newItem"), "click").subscribe -> new ItemInsertDialog(dt).draw()
+  render = ({failed, description, result: [spread, accuserid, state, result]}) ->
+    if failed then description else spread.withItems(arrayToSeq(result).fmap(AccountType.accountType).toSet()).render()
 
-  logoutButton = -> fromEvent((document.getElementById "logoutItem"), "click").subscribe -> location.href = "/logout"
+  newButtonObs = -> fromEvent(newItemButton, "click").flatMap -> itemInsertDialog(newItemButton.name.split "_").draw()
 
-  addActionToButton = whenNotFail ([spread, accuserid, state, result]) ->
-    newButton.andThen(logoutButton).andThen(-> {result: [spread, accuserid, state, result]}) [accuserid, state]
+  scan_ = (acc, x, i, src) -> if not (x instanceof Either) then acc
+  else
+    if x.isRight() then acc.withItems set x.value()
+    else (-> alert x.value()).andThen(-> acc)()
 
   DOM.ready()
-    .map(spreadsheet("#spreadsheetdiv").render).flatMap(loadData).flatMap(loadItems).map(addActionToButton)
-    .subscribe ({failed, description, result: [spread, accuserid, state, result]}) ->
-      if failed then alert description else spread.withItems(arrayToSeq(result).fmap(AccountType.accountType).toSet()).render()
+    .map spreadsheet("#spreadsheetdiv").render
+    .merge logoutButton
+    .flatMap loadData
+    .flatMap loadItems
+    .map render
+    .merge newButtonObs()
+    .scan scan_
+    .subscribe(
+      (x) -> console.log x
+      (err) -> console.log "Something wrong: #{err}"
+      -> console.log "Completed"
+    )
