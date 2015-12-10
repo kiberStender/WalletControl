@@ -14,10 +14,10 @@ do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
 
       validateItem [desc(), itemType(), value(), purchaseDate()]
 
-    callback = -> do (item = @isValid()) -> Rx.Observable.defer(-> $.ajax({
+    callback = (item) -> Rx.Observable.defer(-> $.ajax({
       url: "/spreadsheet/#{state}/#{accuserid}"
       type: "POST", data: JSON.stringify(item.value()), contentType: "application/json;charset=utf-8"
-    })).map ({failed, description, result}) -> if failed then left description else right item.value()
+    })).map ({failed, description, result}) -> if failed then left description else item
 
     super "#insertModal", callback
 

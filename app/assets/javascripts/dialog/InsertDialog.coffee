@@ -1,4 +1,4 @@
-do (bootbox, {Observable: {fromPromise, fromEvent}} = Rx, {just, nothing} = fpJS) ->
+do (bootbox, {Observable: {fromPromise, fromEvent}} = Rx, {right, left} = fpJS) ->
   class InsertDialog then constructor: (modalEl, callback) ->
     send_ = null
     cancel_ = null
@@ -9,10 +9,10 @@ do (bootbox, {Observable: {fromPromise, fromEvent}} = Rx, {just, nothing} = fpJS
     cancel = -> if cancel_ is null then cancel_ = select "#notInsertItem, #closeBtn" else cancel_
 
     sendEvent = => fromEvent(send(), "click").flatMap => do (item = @isValid()) -> if item.isRight()
-      (-> $(modalEl).modal("hide")).andThen(callback)()
-    else (-> $(modalEl).modal("hide")).andThen(-> fromPromise Promise.resolve item.value())()
+      (-> $(modalEl).modal("hide")).andThen( -> callback item)()
+    else fromPromise Promise.resolve item
 
-    cancelEvent = -> fromEvent(cancel(), "click").map(-> nothing())
+    cancelEvent = -> fromEvent(cancel(), "click").map(-> left "")
 
     @draw = -> fromPromise(Promise.resolve $(modalEl).modal "show").merge(cancelEvent()).merge(sendEvent()).scan (acc, x) -> x
 
