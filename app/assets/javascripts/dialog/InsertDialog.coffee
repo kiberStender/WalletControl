@@ -15,7 +15,7 @@ do (bootbox, {Observable: {fromPromise, fromEvent}} = Rx, {left} = fpJS) ->
       (-> $(modalEl).modal "hide").andThen(-> callback item)()
     else fromPromise Promise.resolve item
 
-    cancelListener = -> (-> $(modalEl).modal "hide").andThen(-> left "")()
+    cancelListener = (-> $(modalEl).modal "hide").andThen(-> left "")
 
     #Events
     sendEvent = (-> send().removeEventListener("click", sendListener)).andThen -> fromEvent(send(), "click").flatMap sendListener
