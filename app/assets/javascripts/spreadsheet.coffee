@@ -23,12 +23,14 @@ do (
   render = ({failed, description, result: [spread, accuserid, state, result]}) ->
     if failed then description else spread.withItems(arrayToSeq(result).fmap(AccountType.accountType).toSet()).render()
 
-  newButtonObs = -> fromEvent(newItemButton, "click").flatMap -> itemInsertDialog(newItemButton.name.split "_").draw()
+  newButtonListener = -> itemInsertDialog(newItemButton.name.split "_").draw()
+
+  newButtonObs = (-> newItemButton.removeEventListener("click", newButtonListener)).andThen -> fromEvent(newItemButton, "click").flatMap newButtonListener
 
   scan_ = (acc, x, i, src) -> if not (x instanceof Either) then acc
   else
     if x.isRight() then acc.withItems set x.value()
-    else (-> alert x.value()).andThen(-> acc)()
+    else (-> alert x.value() if x.value() isnt "").andThen(-> acc)()
 
   DOM.ready()
     .map spreadsheet("#spreadsheetdiv").render
