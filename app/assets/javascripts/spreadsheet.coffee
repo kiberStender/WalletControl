@@ -29,7 +29,7 @@ do (
 
   scan_ = (acc, x, i, src) -> if not (x instanceof Either) then acc
   else
-    if x.isRight() then acc.withItems set x.value()
+    if x.isRight() then acc.withItems(set x.value()).render()
     else (-> alert x.value() if x.value() isnt "").andThen(-> acc)()
 
   DOM.ready()
