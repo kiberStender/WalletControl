@@ -1,5 +1,5 @@
 do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
-  class ItemInsertDialog extends InsertDialog then constructor: ([state, accuserid]) ->
+  class ItemInsertDialog extends InsertDialog then constructor: ([accuserid, state]) ->
 
     validateItem = ([desc, type, value, purchaseDt]) -> if desc is "" then left "Descrição não pode ser vazia"
     else if value <= 0 then left "Valor não pode ser 0 ou menor"
