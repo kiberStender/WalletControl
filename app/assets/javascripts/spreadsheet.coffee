@@ -4,17 +4,16 @@ do (
 ) ->
   whenNotFail = (fn) -> ({failed, description, result}) -> if failed then {failed, description} else fn result
 
-  logoutButton = fromEvent((document.querySelector "#logoutItem"), "click").map -> location.href = "/logout"
+  select = (el) -> document.querySelector el
+
+  logoutButton = fromEvent((select "#logoutItem"), "click").map -> location.href = "/logout"
 
   newItemButton = document.querySelector "#newItem"
 
   loadData = (spread) -> DOM.getJSON("/getData").map whenNotFail ({logonData: {accuserid, username, usermail, profilePicture}, state}) ->
-      document.querySelector("#logedUserProfile").src = profilePicture
-      document.querySelector("#logedUsername").innerHTML = "Hello #{username}"
-      document.querySelector("#logedUsermail").innerHTML = usermail
-      newItemButton.name = "#{accuserid}_#{state}"
-
-      {result: [spread, accuserid, state]}
+    (-> select("#logedUserProfile").src = profilePicture).andThen -> select("#logedUsername").innerHTML = "Hello #{username}"
+      .andThen(-> select("#logedUsermail").innerHTML = usermail).andThen -> newItemButton.name = "#{accuserid}_#{state}"
+      .andThen(-> {result: [spread, accuserid, state]})()
 
   loadItems = whenNotFail ([spread, accuserid, state]) ->
     DOM.getJSON("/spreadsheet/#{state}/#{accuserid}").map whenNotFail (result) -> {result: [spread, accuserid, state, result]}
