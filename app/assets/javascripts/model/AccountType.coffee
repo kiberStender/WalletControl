@@ -1,12 +1,12 @@
-do ({Ordering, arrayToSeq, set} = fpJS.withFnExtension(), Item) ->
+do ({Ordering, arrayToSeq, set, seq} = fpJS.withFnExtension(), Item) ->
   class AccountType extends Ordering then constructor: (@accountTypeId, @accName, @description, @closingDay, @items, @balances) ->
-    [{realbalance}] = balances
+    #[{realbalance}] = balances
 
     @compare = (accType) -> if accName is accType.accName then 0 else (if accName < accType.accName then -1 else 1)
 
     @toString = -> JSON.stringify @
 
-    header = -> """<tr>
+    header = -> do ([{realbalance}] = balances) -> """<tr>
       <td>#{accName}</td>
       <td></td>
       <td></td>
@@ -23,7 +23,7 @@ do ({Ordering, arrayToSeq, set} = fpJS.withFnExtension(), Item) ->
            #{saldo parseFloat(entrada + saida).toFixed 2}
          </tr>"""
 
-    body = -> items.foldLeft([[0, 0, realbalance], ""]) ([[entrada, saida, saldoTotal], trs]) -> (item) ->
+    body = -> do ([{realbalance}] = balances) -> items.foldLeft([[0, 0, realbalance], ""]) ([[entrada, saida, saldoTotal], trs]) -> (item) ->
       [ent, sai] = if item.value > 0 then [item.value, 0.00] else [0.00, item.value]
       total =  [entrada + ent, saida + sai, saldoTotal + item.value]
       [total, "#{trs}#{item.draw saldoTotal}"]
@@ -31,6 +31,11 @@ do ({Ordering, arrayToSeq, set} = fpJS.withFnExtension(), Item) ->
     @draw = ->
       [tfoot, tbody] = body()
       "#{header()}#{tbody}#{foot tfoot}"
+
+    @withItems = (items_ = seq()) ->
+      new AccountType accountTypeId, accName, description, closingDay, (items.concat items_), balances
+
+    @withItem = (item) -> new AccountType accountTypeId, accName, description, closingDay, (items.cons item), balances
 
   accountType = ({accountTypeId, accName, description, closingDay, items, balances}) ->
     items_ = arrayToSeq(items).fmap(Item.item)

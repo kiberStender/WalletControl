@@ -1,5 +1,7 @@
 do ({set, arrayToSeq} = fpJS.withFnExtension()) ->
   class Spreadsheet then constructor: (el, placed, accTypes = set()) ->
+    select = (el) -> document.querySelector el
+
     base = -> """<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp full-width" id="spreadsheet">
                       <thead>
                         <tr>
@@ -10,7 +12,7 @@ do ({set, arrayToSeq} = fpJS.withFnExtension()) ->
                           <th>Saldo</th>
                         </tr>
                       </thead>
-                      <tbody></tbody>
+                      <tbody>#{accTypes.foldLeft("") (acc) -> (acctype) -> acc + acctype.draw()}</tbody>
                       <tfoot>
                         <tr>
                           <td colspan="2">Totais</td>
@@ -21,15 +23,14 @@ do ({set, arrayToSeq} = fpJS.withFnExtension()) ->
                       </tfoot>
                     </table>"""
 
-    renderNotPlaced = -> document.querySelector(el).innerHTML = base()
-    renderPlaced = ->
-      document.querySelector("#spreadsheet tbody").innerHTML = accTypes.foldLeft("") (acc) -> (acctype) -> acc + acctype.draw()
+    renderNotPlaced = -> select(el).innerHTML = base()
 
-    render_ = -> if placed then renderPlaced() else renderNotPlaced()
+    @render = renderNotPlaced.andThen -> new Spreadsheet el, true, accTypes
 
-    @render = -> render_.andThen(-> new Spreadsheet el, true, accTypes)()
+    @withAccTypes = (nAccTypes) -> new Spreadsheet(el, placed, accTypes.concat nAccTypes)
 
-    @withItems = (nAccTypes) -> new Spreadsheet(el, placed, accTypes.concat nAccTypes)
+    @withAccType = (accType) ->
+      new Spreadsheet el, placed, accTypes.fmap (acc) -> if acc.equals accType then acc.withItems accType.items else acc
 
     @toString = -> accTypes.toString()
 

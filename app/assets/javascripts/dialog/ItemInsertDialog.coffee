@@ -1,4 +1,4 @@
-do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
+do (InsertDialog, Item, {right, left, seq} = fpJS, $ = jQuery) ->
   class ItemInsertDialog extends InsertDialog then constructor: ([accuserid, state]) ->
 
     validateItem = ([desc, type, value, purchaseDt]) -> if desc is "" then left "Descrição não pode ser vazia"
@@ -17,7 +17,8 @@ do (InsertDialog, Item, {right, left} = fpJS, $ = jQuery) ->
     callback = (item) -> Rx.Observable.defer(-> $.ajax({
       url: "/spreadsheet/#{state}/#{accuserid}"
       type: "POST", data: JSON.stringify(item.value()), contentType: "application/json;charset=utf-8"
-    })).map ({failed, description, result}) -> if failed then left description else item
+    })).map ({failed, description, result}) -> if failed then left description
+    else right new AccountType "5cfb525a5c5a5dd29beb6f257b6a7f22d157c630", "", "", "", seq(item.value()), []
 
     super "#insertModal", callback
 

@@ -17,11 +17,10 @@ do (
       {result: [spread, accuserid, state]}
 
   loadItems = whenNotFail ([spread, accuserid, state]) ->
-    DOM.getJSON("/spreadsheet/#{state}/#{accuserid}").map whenNotFail (result) ->
-      {result: [spread, accuserid, state, result]}
+    DOM.getJSON("/spreadsheet/#{state}/#{accuserid}").map whenNotFail (result) -> {result: [spread, accuserid, state, result]}
 
   render = ({failed, description, result: [spread, accuserid, state, result]}) ->
-    if failed then description else spread.withItems(arrayToSeq(result).fmap(AccountType.accountType).toSet()).render()
+    if failed then description else spread.withAccTypes(arrayToSeq(result).fmap(AccountType.accountType).toSet()).render()
 
   newButtonListener = -> itemInsertDialog(newItemButton.name.split "_").draw()
 
@@ -29,7 +28,7 @@ do (
 
   scan_ = (acc, x, i, src) -> if not (x instanceof Either) then acc
   else
-    if x.isRight() then acc.withItems(set x.value()).render()
+    if x.isRight() then acc.withAccType(x.value()).render()
     else (-> alert x.value() if x.value() isnt "").andThen(-> acc)()
 
   DOM.ready()
