@@ -1,7 +1,11 @@
 do ({Ordering} = fpJS.withFnExtension()) ->
   class Item extends Ordering then constructor: (@itemId, @description, @value, @purchaseDate, @trtType) ->
     @toString = -> JSON.stringify @
+
     toDate = (str) -> new Date(str)
+
+    fixTo2 = (n) -> parseFloat(n).toFixed 2
+
     @compare = (item) ->
       this_dt = toDate(purchaseDate).getTime()
       that_dt = toDate(item.purchaseDate).getTime()
@@ -11,8 +15,6 @@ do ({Ordering} = fpJS.withFnExtension()) ->
         formatDay = (day) -> if day > 9 then day else "0#{day}"
         formatMonth = (month) -> if month > 9 then month else "0#{month}"
         "#{formatDay dt.getDate() + 1}-#{formatMonth dt.getMonth() + 1}-#{dt.getFullYear()}"
-
-    fixTo2 = (n) -> parseFloat(n).toFixed 2
 
     @draw = (saldo) ->
       [ent, sai] = if value > 0 then [value, 0.00] else [0.00, value]
